@@ -12,6 +12,7 @@ namespace NCloud.Drives.Tests
     using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.FileProviders;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using NCloud.Core;

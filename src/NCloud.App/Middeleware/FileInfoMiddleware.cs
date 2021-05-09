@@ -53,10 +53,13 @@ namespace NCloud.App.Middeleware
                 var path = context.Request.Path.Value;
                 path = path.Substring(prefix.Length);
                 path = string.IsNullOrEmpty(path) ? "/" : path;
-                var fileInfo = await driveFactory.GetFileInfosByPathAsync(path);
+                var fileInfo = await driveFactory.GetFileInfosByPathAsync(path);               
                 await context.Response.WriteAsJsonAsync(fileInfo);
             }
-            await this.next.Invoke(context);
+            else
+            {
+                await this.next.Invoke(context);
+            }
         }
     }
 }

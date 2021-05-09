@@ -1,0 +1,76 @@
+﻿// -----------------------------------------------------------------------
+// <copyright file="FileInfoDecorator.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NCloud.FileProviders.Abstractions
+{
+    using System;
+    using System.IO;
+    using Microsoft.Extensions.FileProviders;
+
+    /// <summary>
+    /// Defines the <see cref="FileInfoDecorator" />.
+    /// </summary>
+    public abstract class FileInfoDecorator : IFileInfo
+    {
+        /// <summary>
+        /// Defines the fileInfo.
+        /// </summary>
+        private readonly IFileInfo fileInfo;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileInfoDecorator"/> class.
+        /// </summary>
+        /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
+        public FileInfoDecorator(IFileInfo fileInfo)
+        {
+            this.fileInfo = fileInfo;
+        }
+
+        /// <summary>
+        /// Gets the InnerIFileInfo.
+        /// </summary>
+        public IFileInfo InnerIFileInfo => fileInfo;
+
+        /// <summary>
+        /// Gets a value indicating whether Exists.
+        /// </summary>
+        public bool Exists => fileInfo.Exists;
+
+        /// <summary>
+        /// Gets the Length.
+        /// </summary>
+        public long Length => fileInfo.Length;
+
+        /// <summary>
+        /// Gets the PhysicalPath.
+        /// </summary>
+        public string PhysicalPath => fileInfo.PhysicalPath;
+
+        /// <summary>
+        /// Gets the Name.
+        /// </summary>
+        public string Name => fileInfo.Name;
+
+        /// <summary>
+        /// Gets the LastModified.
+        /// </summary>
+        public DateTimeOffset LastModified => fileInfo.LastModified;
+
+        /// <summary>
+        /// Gets a value indicating whether IsDirectory.
+        /// </summary>
+        public bool IsDirectory => fileInfo.IsDirectory;
+
+        /// <summary>
+        /// The CreateReadStream.
+        /// </summary>
+        /// <returns>The <see cref="Stream"/>.</returns>
+        public virtual Stream CreateReadStream()
+        {
+            return fileInfo.CreateReadStream();
+        }
+    }
+}
