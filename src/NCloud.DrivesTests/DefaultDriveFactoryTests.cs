@@ -53,7 +53,7 @@ namespace NCloud.Drives.Tests
         public async Task DefaultDriveFactoryTest()
         {
             IDriveFactory driveFactory = this.provider.GetService<IDriveFactory>();
-            var config = File.ReadAllText(Directory.GetCurrentDirectory() + @"\samples\sample1.yml");
+            var config = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(),"samples", "sample1.yml"));
             config = $"virtual:{systemHelper.EncodeBase64(config)}";
             driveFactory.TryEnableDrive("/test1", config);
             var osinfos = await driveFactory.GetFileInfosByPathAsync("/test1/os");
@@ -70,13 +70,11 @@ namespace NCloud.Drives.Tests
         public async Task DefaultDriveFactoryTest2()
         {
             IDriveFactory driveFactory = this.provider.GetService<IDriveFactory>();
-            var config = File.ReadAllText(Directory.GetCurrentDirectory() + @"\samples\sample2.yml");
+            var config = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "samples", "sample2.yml"));
             config = $"virtual:{systemHelper.EncodeBase64(config)}";
             driveFactory.TryEnableDrive("/test2", config);
             var osinfos = await driveFactory.GetFileInfosByPathAsync("/test2/os");
             Assert.IsTrue(osinfos.Data is IEnumerable<Core.Model.FileInfo>);
-
-            var fsInfo = await driveFactory.GetFileInfosByPathAsync("/test2/telegram");
         }
     }
 }

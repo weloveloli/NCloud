@@ -53,7 +53,7 @@ namespace NCloud.Drives.Tests
         [TestMethod()]
         public async Task VirtualDriveTest()
         {
-            var config = File.ReadAllText(Directory.GetCurrentDirectory() + @"\samples\sample1.yml");
+            var config = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "samples", "sample1.yml"));
             config = $"virtual:{systemHelper.EncodeBase64(config)}";
             var drive = new VirtualDrive(config, "/test1", this.provider);
             var osinfos = await drive.GetFileInfosByPathAsync("os");
