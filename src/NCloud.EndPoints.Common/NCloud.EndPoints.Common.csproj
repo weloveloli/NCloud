@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NCloud.FileProviders.Abstractions\NCloud.FileProviders.Abstractions.csproj" />
+    <ProjectReference Include="..\NCloud.FileProviders.GitHub\NCloud.FileProviders.GitHub.csproj" />
+    <ProjectReference Include="..\NCloud.FileProviders.Physical\NCloud.FileProviders.Physical.csproj" />
+    <ProjectReference Include="..\NCloud.FileProviders.Virtual\NCloud.FileProviders.Virtual.csproj" />
+    <ProjectReference Include="..\NCloud.Utils\NCloud.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

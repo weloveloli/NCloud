@@ -10,9 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NCloud.FileProviders.GitHub\NCloud.FileProviders.GitHub.csproj" />
-    <ProjectReference Include="..\NCloud.FileProviders.Physical\NCloud.FileProviders.Physical.csproj" />
-    <ProjectReference Include="..\NCloud.Utils\NCloud.Utils.csproj" />
+    <ProjectReference Include="..\NCloud.EndPoints.Common\NCloud.EndPoints.Common.csproj" />
   </ItemGroup>
 
 </Project>

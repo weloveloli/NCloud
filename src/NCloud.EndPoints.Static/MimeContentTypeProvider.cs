@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.ServerCommon
+namespace NCloud.EndPoints.Static
 {
     using HeyRed.Mime;
     using Microsoft.AspNetCore.StaticFiles;
