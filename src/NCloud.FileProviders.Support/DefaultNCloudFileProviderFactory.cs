@@ -4,13 +4,14 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions
+namespace NCloud.FileProviders.Support
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using NCloud.FileProviders.Abstractions;
     using NCloud.Utils;
 
     /// <summary>

@@ -4,12 +4,13 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.AbstractionsTests
+namespace NCloud.FileProviders.SupportTests
 {
     using System.Linq;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NCloud.FileProviders.Abstractions;
+    using NCloud.FileProviders.Support;
 
     /// <summary>
     /// Defines the <see cref="DefaultNCloudFileProviderFactoryTests" />.

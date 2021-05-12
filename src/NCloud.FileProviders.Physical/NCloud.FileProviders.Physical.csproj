@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NCloud.FileProviders.Abstractions\NCloud.FileProviders.Abstractions.csproj" />
+    <ProjectReference Include="..\NCloud.FileProviders.Support\NCloud.FileProviders.Support.csproj" />
   </ItemGroup>
 
 </Project>

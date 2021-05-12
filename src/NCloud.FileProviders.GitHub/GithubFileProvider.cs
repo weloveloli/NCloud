@@ -11,6 +11,7 @@ namespace NCloud.FileProviders.GitHub
     using System.Net.Http;
     using Microsoft.Extensions.FileProviders;
     using NCloud.FileProviders.Abstractions;
+    using NCloud.FileProviders.Support;
 
     /// <summary>
     /// Defines the <see cref="GithubFileProvider" />.

@@ -15,6 +15,7 @@ namespace NCloud.StaticServer
     using NCloud.EndPoints.Static;
     using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.GitHub;
+    using NCloud.FileProviders.Support;
     using NCloud.Utils;
 
     /// <summary>

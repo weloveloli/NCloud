@@ -4,12 +4,13 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions
+namespace NCloud.FileProviders.Support
 {
     using System.IO;
     using System.Text;
     using System.Threading.Tasks;
     using Microsoft.Extensions.FileProviders;
+    using NCloud.FileProviders.Abstractions;
     using NCloud.Utils;
 
     /// <summary>

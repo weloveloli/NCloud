@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions
+namespace NCloud.FileProviders.Support
 {
     using System;
     using System.Collections.Generic;
@@ -12,6 +12,7 @@ namespace NCloud.FileProviders.Abstractions
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Logging;
+    using NCloud.FileProviders.Abstractions;
     using NCloud.Utils;
 
     /// <summary>

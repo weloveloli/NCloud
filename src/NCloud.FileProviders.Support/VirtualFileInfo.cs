@@ -4,10 +4,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions
+namespace NCloud.FileProviders.Support
 {
     using System;
     using System.IO;
+    using NCloud.FileProviders.Abstractions;
 
     /// <summary>
     /// Defines the <see cref="VirtualFileInfo" />.

@@ -13,6 +13,7 @@ namespace NCloud.FileProviders.Virtual.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using NCloud.FileProviders.Abstractions;
+    using NCloud.FileProviders.Support;
     using NCloud.Utils;
 
     /// <summary>

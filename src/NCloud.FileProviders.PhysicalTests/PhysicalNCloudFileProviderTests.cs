@@ -11,6 +11,7 @@ namespace NCloud.FileProviders.Physical.Tests
     using Microsoft.Extensions.FileProviders;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NCloud.FileProviders.Abstractions;
+    using NCloud.FileProviders.Support;
 
     /// <summary>
     /// Defines the <see cref="PhysicalNCloudFileProviderTests" />.

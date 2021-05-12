@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.AbstractionsTests
+namespace NCloud.FileProviders.Support
 {
     using System;
     using System.Collections.Generic;

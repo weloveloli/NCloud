@@ -10,6 +10,7 @@ namespace NCloud.FileProviders.Virtual
     using System.Collections.Generic;
     using Microsoft.Extensions.FileProviders;
     using NCloud.FileProviders.Abstractions;
+    using NCloud.FileProviders.Support;
 
     /// <summary>
     /// Defines the <see cref="VirtualInnerFileProvider" />.

@@ -12,6 +12,7 @@ namespace NCloud.FileProviders.Virtual
     using System.Net.Http;
     using Microsoft.Extensions.FileProviders;
     using NCloud.FileProviders.Abstractions;
+    using NCloud.FileProviders.Support;
     using NCloud.Utils;
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;

@@ -4,11 +4,12 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions
+namespace NCloud.FileProviders.Support
 {
     using System.IO;
     using System.Net.Http;
     using Microsoft.Extensions.FileProviders;
+    using NCloud.FileProviders.Abstractions;
 
     /// <summary>
     /// Defines the <see cref="IRemoteFileInfo" />.

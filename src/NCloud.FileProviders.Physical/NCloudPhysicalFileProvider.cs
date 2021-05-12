@@ -10,6 +10,7 @@ namespace NCloud.FileProviders.Physical
     using System.IO;
     using Microsoft.Extensions.FileProviders;
     using NCloud.FileProviders.Abstractions;
+    using NCloud.FileProviders.Support;
     using NCloud.Utils;
 
     /// <summary>
