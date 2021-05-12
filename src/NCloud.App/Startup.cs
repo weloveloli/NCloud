@@ -12,10 +12,6 @@ namespace NCloud.App
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using NCloud.App.Middeleware;
-    using NCloud.Core;
-    using NCloud.Drivers;
-    using NCloud.Drives;
 
     /// <summary>
     /// Defines the <see cref="Startup" />.
@@ -50,17 +46,7 @@ namespace NCloud.App
             {
                 configuration.RootPath = "ClientApp/build";
             });
-            services.AddHttpClient();
-            services.AddSingleton<ISystemHelper, DefaultSystemHelper>();
-            services.AddSingleton<IDriveFactory>((sp) =>
-            {
-                var factory = new DefaultDriveFactory(sp);
-                factory.TryEnableDrive("/github", "github:weloveloli/NCloud");
-                factory.TryAddRoot("/github", "github");
-                factory.TryEnableDrive("/example", "fs:./");
-                factory.TryAddRoot("/example", "example");
-                return factory;
-            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -94,7 +80,6 @@ namespace NCloud.App
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
             });
-            app.UseMiddleware<FileInfoMiddleware>();
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";

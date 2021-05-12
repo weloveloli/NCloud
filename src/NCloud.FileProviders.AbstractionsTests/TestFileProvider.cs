@@ -12,7 +12,6 @@ namespace NCloud.FileProviders.AbstractionsTests
     using System.Linq;
     using Microsoft.Extensions.FileProviders;
     using NCloud.FileProviders.Abstractions;
-    using NCloud.FileProviders.Abstractions.Extensions;
     using NCloud.Utils;
 
     /// <summary>

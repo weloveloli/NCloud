@@ -4,10 +4,9 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions.Extensions
+namespace NCloud.FileProviders.Abstractions
 {
     using System.IO;
-    using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
     using Microsoft.Extensions.FileProviders;
@@ -48,6 +47,10 @@ namespace NCloud.FileProviders.Abstractions.Extensions
         {
             Check.NotNull(fileInfo, nameof(fileInfo));
 
+            if( fileInfo is InMemoryFileInfo memoryFileInfo)
+            {
+                return memoryFileInfo.ReadAsString(encoding);
+            }
             using var stream = fileInfo.CreateReadStream();
             using var streamReader = new StreamReader(stream, encoding, true);
             return streamReader.ReadToEnd();
@@ -63,6 +66,10 @@ namespace NCloud.FileProviders.Abstractions.Extensions
         {
             Check.NotNull(fileInfo, nameof(fileInfo));
 
+            if (fileInfo is InMemoryFileInfo memoryFileInfo)
+            {
+                return memoryFileInfo.ReadAsString(encoding);
+            }
             await using var stream = fileInfo.CreateReadStream();
             using var streamReader = new StreamReader(stream, encoding, true);
             return await streamReader.ReadToEndAsync();

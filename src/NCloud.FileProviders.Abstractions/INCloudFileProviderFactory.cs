@@ -18,7 +18,7 @@ namespace NCloud.FileProviders.Abstractions
         /// </summary>
         /// <param name="config">The config<see cref="string"/>.</param>
         /// <returns>The <see cref="IFileProvider"/>.</returns>
-        NCloudFileProvider CreateProvider(string config, string prefix = "");
+        BaseNCloudFileProvider CreateProvider(string config, string prefix = "");
 
     }
 }

@@ -16,7 +16,7 @@ namespace NCloud.FileProviders.GitHub
     /// Defines the <see cref="GithubFileProvider" />.
     /// </summary>
     [FileProvider(Name = "github", Protocol = "github")]
-    public class GithubFileProvider : NCloudFileProvider
+    public class GithubFileProvider : PrefixNCloudFileProvider
     {
         /// <summary>
         /// Defines the owner.

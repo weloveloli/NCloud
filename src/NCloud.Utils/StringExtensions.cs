@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions.Extensions
+namespace NCloud.Utils
 {
     using System;
     using System.Globalization;
@@ -657,8 +657,8 @@ namespace NCloud.FileProviders.Abstractions.Extensions
             {
                 path = Regex.Replace(path, @"^\/([^\/]+?)", @"$1:\\");
                 path = Regex.Replace(path, @"\/", "\\");
-                path = Regex.Replace(path, @"(?<!\:)\\+$","");
-                path = Regex.Replace(path, @"\\{2,}","\\");
+                path = Regex.Replace(path, @"(?<!\:)\\+$", "");
+                path = Regex.Replace(path, @"\\{2,}", "\\");
             }
             if (relative)
             {
@@ -680,6 +680,45 @@ namespace NCloud.FileProviders.Abstractions.Extensions
                 path = Regex.Replace(path, @"^([a-zA-Z])\:", "/$1");
             }
             return path;
+        }
+
+        /// <summary>
+        /// The IsSubpathOf.
+        /// </summary>
+        /// <param name="path1">The path1<see cref="string"/>.</param>
+        /// <param name="path2">The path2<see cref="string"/>.</param>
+        /// <returns>The <see cref="bool"/>.</returns>
+        public static bool IsSubpathOf(this string path1, string path2)
+        {
+            if (path1 == null || path2 == null)
+            {
+                return false;
+            }
+            path1 = path1.EnsureStartsWith('/');
+            path2 = path2.EnsureStartsWith('/');
+            if (path1 == path2 || !path1.StartsWith(path2))
+            {
+                return false;
+            }
+            if(path2 == "/")
+            {
+                return path1.LastIndexOf("/") == 0;
+            }
+            var paths1 = path1.Split("/");
+            var paths2 = path2.Split("/");
+            if (paths1.Length != paths2.Length + 1)
+            {
+                return false;
+            }
+
+            for(var i = 0; i < paths2.Length; i++)
+            {
+                if (paths1[i] != paths2[i])
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

@@ -37,32 +37,32 @@ namespace NCloud.FileProviders.Abstractions
         /// <summary>
         /// Gets a value indicating whether Exists.
         /// </summary>
-        public bool Exists => fileInfo.Exists;
+        public virtual bool Exists => fileInfo.Exists;
 
         /// <summary>
         /// Gets the Length.
         /// </summary>
-        public long Length => fileInfo.Length;
+        public virtual long Length => fileInfo.Length;
 
         /// <summary>
         /// Gets the PhysicalPath.
         /// </summary>
-        public string PhysicalPath => fileInfo.PhysicalPath;
+        public virtual string PhysicalPath => fileInfo.PhysicalPath;
 
         /// <summary>
         /// Gets the Name.
         /// </summary>
-        public string Name => fileInfo.Name;
+        public virtual string Name => fileInfo.Name;
 
         /// <summary>
         /// Gets the LastModified.
         /// </summary>
-        public DateTimeOffset LastModified => fileInfo.LastModified;
+        public virtual DateTimeOffset LastModified => fileInfo.LastModified;
 
         /// <summary>
         /// Gets a value indicating whether IsDirectory.
         /// </summary>
-        public bool IsDirectory => fileInfo.IsDirectory;
+        public virtual bool IsDirectory => fileInfo.IsDirectory;
 
         /// <summary>
         /// The CreateReadStream.

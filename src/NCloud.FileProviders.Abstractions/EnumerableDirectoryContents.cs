@@ -30,6 +30,15 @@ namespace NCloud.FileProviders.Abstractions
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="EnumerableDirectoryContents"/> class.
+        /// </summary>
+        /// <param name="fileInfo">The fileInfo<see cref="IFileInfo[]"/>.</param>
+        public EnumerableDirectoryContents(params IFileInfo[] fileInfo)
+        {
+            _entries = fileInfo;
+        }
+
+        /// <summary>
         /// Gets a value indicating whether Exists.
         /// </summary>
         public bool Exists => true;

@@ -14,9 +14,9 @@ namespace NCloud.StaticServer
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using NCloud.FileProviders.Abstractions;
-    using NCloud.FileProviders.Abstractions.Extensions;
     using NCloud.FileProviders.GitHub;
     using NCloud.ServerCommon;
+    using NCloud.Utils;
 
     /// <summary>
     /// Defines the <see cref="Startup" />.
@@ -45,11 +45,8 @@ namespace NCloud.StaticServer
         {
             services.AddHttpClient();
             services.AddSingleton<GitHubClient>();
-            services.AddSingleton((sp) =>
-            {
-                var factory = new DefaultNCloudFileProviderFactory(sp);
-                return factory;
-            });
+            services.AddSingleton<INCloudDynamicFileProvider, DefaultNCloudDynamicFileProvider>();
+            services.AddSingleton<INCloudFileProviderFactory, DefaultNCloudFileProviderFactory>();
             services.AddSingleton<IContentTypeProvider, MimeContentTypeProvider>();
             services.AddDirectoryBrowser();
             services.AddControllersWithViews();
@@ -75,21 +72,22 @@ namespace NCloud.StaticServer
 
             app.UseHttpsRedirection();
             var service = app.ApplicationServices;
-            var fileProvider = service.GetService<DefaultNCloudFileProviderFactory>();
-            fileProvider.CreateProvider("github:weloveloli/NCloud", "/github");
-            fileProvider.CreateProvider($"fs:{env.WebRootPath.ToPosixPath()}", "");
+            var fileProvider = service.GetService<INCloudFileProviderFactory>();
+            var dynamicFileProvider = service.GetService<INCloudDynamicFileProvider>();
+            dynamicFileProvider.AddProvider(fileProvider.CreateProvider("github:weloveloli/NCloud", "/github"));
+            dynamicFileProvider.AddProvider(fileProvider.CreateProvider($"fs:{env.WebRootPath.ToPosixPath()}", ""));
             app.UseStaticFiles(new StaticFileOptions
             {
-                FileProvider = fileProvider,
+                FileProvider = dynamicFileProvider,
                 RequestPath = "",
                 DefaultContentType = "application/octet-stream",
                 ServeUnknownFileTypes = false,
                 ContentTypeProvider = service.GetService<IContentTypeProvider>()
-        });
+            });
 
             app.UseDirectoryBrowser(new DirectoryBrowserOptions
             {
-                FileProvider = fileProvider,
+                FileProvider = dynamicFileProvider,
                 RequestPath = ""
             });
 

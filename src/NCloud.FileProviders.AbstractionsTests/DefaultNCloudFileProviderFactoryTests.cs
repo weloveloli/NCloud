@@ -4,13 +4,12 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.ServerCommon.Tests
+namespace NCloud.FileProviders.AbstractionsTests
 {
     using System.Linq;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NCloud.FileProviders.Abstractions;
-    using NCloud.ServerCommon;
 
     /// <summary>
     /// Defines the <see cref="DefaultNCloudFileProviderFactoryTests" />.
@@ -40,23 +39,25 @@ namespace NCloud.ServerCommon.Tests
         public void DefaultNCloudFileProviderFactoryTest()
         {
             var factory = new DefaultNCloudFileProviderFactory(provider);
-            _ = factory.CreateProvider("test:/123.txt;/abc/123.txt;/abc/124.txt;/abc/125.txt;/efd/125.txt;/abc/efd/125.txt", "/test");
-            _ = factory.CreateProvider("test:/124.txt;/abc/124.txt", "/test2");
-
-            var content = factory.GetDirectoryContents("/test");
+            var registration = new DefaultNCloudDynamicFileProvider();
+            registration.AddProvider( factory.CreateProvider("test:/123.txt;/abc/123.txt;/abc/124.txt;/abc/125.txt;/efd/125.txt;/abc/efd/125.txt", "/test"));
+            registration.AddProvider(factory.CreateProvider("test:/124.txt;/abc/124.txt", "/test2"));
+            var root = registration.GetDirectoryContents("/");
+            Assert.AreEqual(2, root.Count());
+            var content = registration.GetDirectoryContents("/test");
             Assert.IsTrue(content.Any());
             Assert.AreEqual(3, content.Count());
-            content = factory.GetDirectoryContents("/test/abc");
+            content = registration.GetDirectoryContents("/test/abc");
             Assert.IsTrue(content.Any());
             Assert.AreEqual(4, content.Count());
-            var fileInfo = factory.GetFileInfo("/test2/abc/124.txt");
+            var fileInfo = registration.GetFileInfo("/test2/abc/124.txt");
             Assert.IsTrue(fileInfo.Exists);
             Assert.IsFalse(fileInfo.IsDirectory);
             Assert.IsTrue(fileInfo is NCloudFileInfo);
             var nCloudFileInfo = (NCloudFileInfo)fileInfo;
             Assert.AreEqual("/test2/abc/124.txt", nCloudFileInfo.Path);
 
-            content = factory.GetDirectoryContents("/");
+            content = registration.GetDirectoryContents("/");
             Assert.AreEqual(2, content.Count());
         }
     }

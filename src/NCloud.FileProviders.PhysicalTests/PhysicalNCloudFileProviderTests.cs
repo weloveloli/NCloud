@@ -6,10 +6,11 @@
 
 namespace NCloud.FileProviders.Physical.Tests
 {
+    using System.Linq;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NCloud.FileProviders.Abstractions.Extensions;
+    using NCloud.FileProviders.Abstractions;
 
     /// <summary>
     /// Defines the <see cref="PhysicalNCloudFileProviderTests" />.
@@ -33,7 +34,8 @@ namespace NCloud.FileProviders.Physical.Tests
         {
             var fileProvider = new PhysicalNCloudFileProvider(provider, "fs:./example", "/test1");
             var contents = fileProvider.GetDirectoryContents("/");
-            Assert.AreEqual(NotFoundDirectoryContents.Singleton, contents);
+            Assert.AreNotEqual(NotFoundDirectoryContents.Singleton, contents);
+            Assert.AreEqual(1, contents.Count());
             var contents2 = fileProvider.GetDirectoryContents("/test1");
             Assert.AreNotEqual(NotFoundDirectoryContents.Singleton, contents2);
             var contents3 = fileProvider.GetDirectoryContents("/test1/abc");

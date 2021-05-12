@@ -43,7 +43,7 @@ namespace NCloud.FileProviders.Abstractions
         /// <summary>
         /// Gets a value indicating whether IsDirectory.
         /// </summary>
-        public bool IsDirectory => false;
+        public virtual bool IsDirectory => false;
 
         /// <summary>
         /// Defines the _fileContent.
@@ -91,6 +91,26 @@ namespace NCloud.FileProviders.Abstractions
         public Stream CreateReadStream()
         {
             return new MemoryStream(_fileContent, false);
+        }
+
+        /// <summary>
+        /// The ReadAsString.
+        /// </summary>
+        /// <param name="encoding">The encoding<see cref="Encoding"/>.</param>
+        /// <returns>The <see cref="string"/>.</returns>
+        public string ReadAsString()
+        {
+            return Encoding.UTF8.GetString(_fileContent);
+        }
+
+        /// <summary>
+        /// The ReadAsString.
+        /// </summary>
+        /// <param name="encoding">The encoding<see cref="Encoding"/>.</param>
+        /// <returns>The <see cref="string"/>.</returns>
+        public string ReadAsString(Encoding encoding)
+        {
+            return encoding.GetString(_fileContent);
         }
 
         /// <summary>

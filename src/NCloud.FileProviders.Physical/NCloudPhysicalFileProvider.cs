@@ -10,13 +10,13 @@ namespace NCloud.FileProviders.Physical
     using System.IO;
     using Microsoft.Extensions.FileProviders;
     using NCloud.FileProviders.Abstractions;
-    using NCloud.FileProviders.Abstractions.Extensions;
+    using NCloud.Utils;
 
     /// <summary>
     /// Defines the <see cref="PhysicalNCloudFileProvider" />.
     /// </summary>
     [FileProvider(Name = "fs", Protocol = "fs")]
-    public class PhysicalNCloudFileProvider : NCloudFileProvider
+    public class PhysicalNCloudFileProvider : PrefixNCloudFileProvider
     {
         /// <summary>
         /// Defines the _provider.

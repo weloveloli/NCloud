@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions.Extensions
+namespace NCloud.Utils
 {
     using System.IO;
     using System.Threading;

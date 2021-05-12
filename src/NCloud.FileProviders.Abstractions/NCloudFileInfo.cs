@@ -6,8 +6,6 @@
 
 namespace NCloud.FileProviders.Abstractions
 {
-    using System;
-    using System.IO;
     using Microsoft.Extensions.FileProviders;
 
     /// <summary>
@@ -15,7 +13,6 @@ namespace NCloud.FileProviders.Abstractions
     /// </summary>
     public class NCloudFileInfo : FileInfoDecorator
     {
-
         /// <summary>
         /// Defines the subPath.
         /// </summary>
@@ -26,7 +23,7 @@ namespace NCloud.FileProviders.Abstractions
         /// </summary>
         /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
         /// <param name="subPath">The subPath<see cref="string"/>.</param>
-        public NCloudFileInfo(IFileInfo fileInfo, string subPath):base(fileInfo)
+        public NCloudFileInfo(IFileInfo fileInfo, string subPath) : base(fileInfo)
         {
             this.subPath = subPath;
         }

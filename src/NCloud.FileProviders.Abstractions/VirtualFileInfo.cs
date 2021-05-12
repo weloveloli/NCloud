@@ -8,7 +8,6 @@ namespace NCloud.FileProviders.Abstractions
 {
     using System;
     using System.IO;
-    using NCloud.FileProviders.Abstractions.Extensions;
 
     /// <summary>
     /// Defines the <see cref="VirtualFileInfo" />.

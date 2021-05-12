@@ -10,13 +10,12 @@ namespace NCloud.FileProviders.Abstractions
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.Extensions.FileProviders;
-    using NCloud.FileProviders.Abstractions.Extensions;
     using NCloud.Utils;
 
     /// <summary>
     /// Defines the <see cref="DictionaryBasedFileProvider" />.
     /// </summary>
-    public class DictionaryBasedFileProvider : NCloudFileProvider
+    public class DictionaryBasedFileProvider : PrefixNCloudFileProvider
     {
         /// <summary>
         /// Defines the _files.
@@ -66,7 +65,7 @@ namespace NCloud.FileProviders.Abstractions
                 return new VirtualFileInfo(relpath);
             }
 
-            return Files.GetOrDefault(NormalizePath(relpath));
+            return Files.GetOrDefault(NormalizePath(relpath))?? new NotFoundFileInfo(relpath);
         }
 
         /// <summary>
