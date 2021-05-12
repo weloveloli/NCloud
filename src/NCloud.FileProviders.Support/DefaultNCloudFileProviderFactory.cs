@@ -106,9 +106,9 @@ namespace NCloud.FileProviders.Support
             }
             var protocol = config.Substring(0, config.IndexOf(":"));
             var providerType = _providerTypes.GetOrDefault(protocol) ?? throw new ArgumentException($"'{nameof(config)}' is invalid, {protocol} is not support.", nameof(config));
-            if (!providerType.IsSubclassOf(typeof(PrefixNCloudFileProvider)))
+            if (!providerType.IsSubclassOf(typeof(BaseNCloudFileProvider)))
             {
-                throw new ArgumentException($"'{nameof(providerType)}' is invalid, must be subclass of NCloudFileProvider.", nameof(providerType));
+                throw new ArgumentException($"'{nameof(providerType)}' {providerType} is invalid, must be subclass of NCloudFileProvider.", nameof(providerType));
             }
             return providerType;
         }

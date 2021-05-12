@@ -10,7 +10,6 @@ namespace NCloud.FileProviders.Physical.Tests
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.Support;
 
     /// <summary>
@@ -19,14 +18,21 @@ namespace NCloud.FileProviders.Physical.Tests
     [TestClass()]
     public class PhysicalNCloudFileProviderTests
     {
+        /// <summary>
+        /// Defines the provider.
+        /// </summary>
         private ServiceProvider provider;
 
+        /// <summary>
+        /// The Init.
+        /// </summary>
         [TestInitialize]
         public void Init()
         {
             var serviceCollection = new ServiceCollection();
             this.provider = serviceCollection.BuildServiceProvider();
         }
+
         /// <summary>
         /// The PhysicalNCloudFileProviderTest.
         /// </summary>
