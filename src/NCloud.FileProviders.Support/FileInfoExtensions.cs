@@ -8,6 +8,7 @@ namespace NCloud.FileProviders.Support
 {
     using System.IO;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.FileProviders;
     using NCloud.FileProviders.Abstractions;
@@ -48,9 +49,13 @@ namespace NCloud.FileProviders.Support
         {
             Check.NotNull(fileInfo, nameof(fileInfo));
 
-            if( fileInfo is InMemoryFileInfo memoryFileInfo)
+            if (fileInfo is IInMemoryFileInfo memoryFileInfo)
             {
-                return memoryFileInfo.ReadAsString(encoding);
+                return encoding.GetString(memoryFileInfo.GetBytes());
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return ReadAsString(decorator.InnerIFileInfo);
             }
             using var stream = fileInfo.CreateReadStream();
             using var streamReader = new StreamReader(stream, encoding, true);
@@ -67,9 +72,13 @@ namespace NCloud.FileProviders.Support
         {
             Check.NotNull(fileInfo, nameof(fileInfo));
 
-            if (fileInfo is InMemoryFileInfo memoryFileInfo)
+            if (fileInfo is IInMemoryFileInfo memoryFileInfo)
             {
-                return memoryFileInfo.ReadAsString(encoding);
+                return encoding.GetString(memoryFileInfo.GetBytes());
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return ReadAsString(decorator.InnerIFileInfo);
             }
             await using var stream = fileInfo.CreateReadStream();
             using var streamReader = new StreamReader(stream, encoding, true);
@@ -84,7 +93,14 @@ namespace NCloud.FileProviders.Support
         public static byte[] ReadBytes(this IFileInfo fileInfo)
         {
             Check.NotNull(fileInfo, nameof(fileInfo));
-
+            if (fileInfo is IInMemoryFileInfo memoryFileInfo)
+            {
+                return memoryFileInfo.GetBytes();
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return ReadBytes(decorator.InnerIFileInfo);
+            }
             using var stream = fileInfo.CreateReadStream();
             return stream.GetAllBytes();
         }
@@ -97,7 +113,14 @@ namespace NCloud.FileProviders.Support
         public static async Task<byte[]> ReadBytesAsync(this IFileInfo fileInfo)
         {
             Check.NotNull(fileInfo, nameof(fileInfo));
-
+            if (fileInfo is IInMemoryFileInfo memoryFileInfo)
+            {
+                return memoryFileInfo.GetBytes();
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return ReadBytes(decorator.InnerIFileInfo);
+            }
             await using var stream = fileInfo.CreateReadStream();
             return await stream.GetAllBytesAsync();
         }
@@ -131,13 +154,68 @@ namespace NCloud.FileProviders.Support
         {
             Check.NotNull(fileInfo, nameof(fileInfo));
 
-            if (fileInfo is RemoteFileInfo remoteFileInfo)
+            if (fileInfo is IRemoteFileInfo remoteFileInfo)
             {
-                return remoteFileInfo.GetRemoteUrl();
+                return remoteFileInfo.RemoteUrl;
             }
             if (fileInfo is FileInfoDecorator decorator)
             {
                 return GetRemoteUrl(decorator.InnerIFileInfo);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// The CreateReadStream.
+        /// </summary>
+        /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
+        /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
+        /// <param name="endPosition">The endPosition<see cref="long?"/>.</param>
+        /// <returns>The <see cref="Stream"/>.</returns>
+        public static Stream CreateReadStream(this IFileInfo fileInfo, long startPosition, long? endPosition)
+        {
+            Check.NotNull(fileInfo, nameof(fileInfo));
+
+            if (fileInfo is IRandomAccessFileInfo randomAccessFileInfo)
+            {
+                return randomAccessFileInfo.CreateReadStream(startPosition, endPosition);
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return CreateReadStream(decorator.InnerIFileInfo, startPosition, endPosition);
+            }
+            return null;
+        }
+        /// <summary>
+        /// The CreateReadStream.
+        /// </summary>
+        /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
+        /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
+        /// <param name="endPosition">The endPosition<see cref="long?"/>.</param>
+        /// <returns>The <see cref="Stream"/>.</returns>
+        public static Task<Stream> CreateReadStreamAsync(this IFileInfo fileInfo, long startPosition)
+        {
+            return CreateReadStreamAsync(fileInfo, startPosition, null, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// The CreateReadStream.
+        /// </summary>
+        /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
+        /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
+        /// <param name="endPosition">The endPosition<see cref="long?"/>.</param>
+        /// <returns>The <see cref="Stream"/>.</returns>
+        public static Task<Stream> CreateReadStreamAsync(this IFileInfo fileInfo, long startPosition, long? endPosition, CancellationToken token)
+        {
+            Check.NotNull(fileInfo, nameof(fileInfo));
+
+            if (fileInfo is IRandomAccessFileInfo randomAccessFileInfo)
+            {
+                return randomAccessFileInfo.CreateReadStreamAsync(startPosition, endPosition, token);
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return CreateReadStreamAsync(decorator.InnerIFileInfo, startPosition, endPosition, token);
             }
             return null;
         }

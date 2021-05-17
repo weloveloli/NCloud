@@ -58,7 +58,13 @@ namespace NCloud.FileProviders.Physical
         /// <returns>The <see cref="IFileInfo"/>.</returns>
         protected override IFileInfo GetFileInfoByRelPath(string relPath)
         {
-            return this._provider.GetFileInfo(relPath);
+            var fileInfo = this._provider.GetFileInfo(relPath);
+            // override the default behabior when the PhysicalPath exist and is a directory
+            if (!fileInfo.Exists && Directory.Exists(fileInfo.PhysicalPath))
+            {
+                return new VirtualFileInfo(relPath);
+            }
+            return new PhysicalNCloudFileInfo(fileInfo);
         }
     }
 }

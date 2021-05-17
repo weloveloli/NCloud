@@ -72,7 +72,7 @@ namespace NCloud.FileProviders.Virtual.Tests
             Assert.AreEqual("ubuntu-18.04.1-desktop-amd64.iso", ubuntuFileInfo.Name);
             Assert.IsTrue(ubuntuFileInfo.Exists);
             Assert.IsFalse(ubuntuFileInfo.IsDirectory);
-            Assert.IsFalse(ubuntuFileInfo is RemoteFileInfo);
+            Assert.IsFalse(ubuntuFileInfo is HttpRemoteFileInfo);
 
             var notfound = v.GetDirectoryContents("/v/os/notfound");
             Assert.IsFalse(notfound.Exists);
@@ -107,7 +107,7 @@ namespace NCloud.FileProviders.Virtual.Tests
             Assert.AreEqual("ubuntu-18.04.1-desktop-amd64.iso", ubuntuFileInfo.Name);
             Assert.IsTrue(ubuntuFileInfo.Exists);
             Assert.IsFalse(ubuntuFileInfo.IsDirectory);
-            Assert.IsFalse(ubuntuFileInfo is RemoteFileInfo);
+            Assert.IsFalse(ubuntuFileInfo is HttpRemoteFileInfo);
 
             var notfound = v.GetDirectoryContents("/v/os/notfound");
             Assert.IsFalse(notfound.Exists);

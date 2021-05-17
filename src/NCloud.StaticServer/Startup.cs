@@ -12,6 +12,7 @@ namespace NCloud.StaticServer
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using NCloud.EndPoints.FTP;
     using NCloud.EndPoints.Static;
     using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.GitHub;
@@ -50,6 +51,7 @@ namespace NCloud.StaticServer
             services.AddSingleton<IContentTypeProvider, MimeContentTypeProvider>();
             services.AddDirectoryBrowser();
             services.AddControllersWithViews();
+            services.AddNCloudFtpServer<INCloudDynamicFileProvider>().AddHostedService<NCloudHostedFtpService>();
         }
 
         /// <summary>

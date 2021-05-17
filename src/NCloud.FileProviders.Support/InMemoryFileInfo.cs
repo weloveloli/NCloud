@@ -4,16 +4,20 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions
+namespace NCloud.FileProviders.Support
 {
     using System;
     using System.IO;
     using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using NCloud.FileProviders.Abstractions;
+    using NCloud.Utils;
 
     /// <summary>
     /// Defines the <see cref="InMemoryFileInfo" />.
     /// </summary>
-    public class InMemoryFileInfo : IVirtualPathFileInfo
+    public class InMemoryFileInfo : IVirtualPathFileInfo, IInMemoryFileInfo, IRandomAccessFileInfo
     {
         /// <summary>
         /// Gets a value indicating whether Exists.
@@ -94,32 +98,48 @@ namespace NCloud.FileProviders.Abstractions
         }
 
         /// <summary>
-        /// The ReadAsString.
-        /// </summary>
-        /// <param name="encoding">The encoding<see cref="Encoding"/>.</param>
-        /// <returns>The <see cref="string"/>.</returns>
-        public string ReadAsString()
-        {
-            return Encoding.UTF8.GetString(_fileContent);
-        }
-
-        /// <summary>
-        /// The ReadAsString.
-        /// </summary>
-        /// <param name="encoding">The encoding<see cref="Encoding"/>.</param>
-        /// <returns>The <see cref="string"/>.</returns>
-        public string ReadAsString(Encoding encoding)
-        {
-            return encoding.GetString(_fileContent);
-        }
-
-        /// <summary>
         /// The GetVirtualPath.
         /// </summary>
         /// <returns>The <see cref="string"/>.</returns>
         public string GetVirtualPath()
         {
             return DynamicPath;
+        }
+
+        /// <summary>
+        /// The GetBytes.
+        /// </summary>
+        /// <returns>The <see cref="byte[]"/>.</returns>
+        public byte[] GetBytes()
+        {
+            return this._fileContent;
+        }
+
+        /// <summary>
+        /// The CreateReadStream.
+        /// </summary>
+        /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
+        /// <param name="endPosition">The endPosition<see cref="long?"/>.</param>
+        /// <returns>The <see cref="Stream"/>.</returns>
+        public Stream CreateReadStream(long startPosition, long? endPosition = null)
+        {
+            Check.CheckIndex(startPosition, endPosition, this.Length);
+            var index = (int)startPosition;
+            var end = endPosition ?? this.Length;
+            return new MemoryStream(_fileContent, index, (int)(end - index), false);
+        }
+
+        /// <summary>
+        /// The CreateReadStreamAsync.
+        /// </summary>
+        /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
+        /// <param name="endPosition">The endPosition<see cref="long?"/>.</param>
+        /// <param name="token">The token<see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="Task{Stream}"/>.</returns>
+        public Task<Stream> CreateReadStreamAsync(long startPosition, long? endPosition, CancellationToken token)
+        {
+            Check.CheckIndex(startPosition, endPosition, this.Length);
+            return Task.FromResult(this.CreateReadStream(startPosition, endPosition));
         }
     }
 }

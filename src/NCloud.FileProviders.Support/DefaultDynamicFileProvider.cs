@@ -92,7 +92,10 @@ namespace NCloud.FileProviders.Support
             try
             {
                 subpath = subpath.EnsureStartsWith('/');
-
+                if (subpath == "/")
+                {
+                    return new VirtualFileInfo(subpath);
+                }
                 return _compositeFileProvider.GetFileInfo(subpath);
 
             }

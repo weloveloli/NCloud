@@ -51,11 +51,11 @@ namespace NCloud.FileProviders.Support
             string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             foreach (string dll in Directory.GetFiles(path, "NCloud.FileProviders.*.dll"))
             {
-                fileProviderAssemblies.Add(Assembly.LoadFile(dll));
+                fileProviderAssemblies.Add(Assembly.LoadFrom(dll));
             }
-            var types = fileProviderAssemblies.SelectMany(e => e.GetExportedTypes());
+            var types = fileProviderAssemblies.SelectMany(e => e.GetExportedTypes())
+                .Where(e => e.IsSubclassOf(typeof(BaseNCloudFileProvider)));
             this._providerTypes = types
-                .Where(e => e.IsSubclassOf(typeof(BaseNCloudFileProvider)))
                 .Where(e => e.GetCustomAttributes(typeof(FileProviderAttribute), false).Length == 1)
                 .Select(e => (((FileProviderAttribute)e.GetCustomAttributes(typeof(FileProviderAttribute), false)[0]).Protocol, e))
                 .ToDictionary(e => e.Protocol, e => e.e);
