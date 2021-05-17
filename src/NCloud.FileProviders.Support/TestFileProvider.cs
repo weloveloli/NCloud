@@ -11,7 +11,6 @@ namespace NCloud.FileProviders.Support
     using System.IO;
     using System.Linq;
     using Microsoft.Extensions.FileProviders;
-    using NCloud.FileProviders.Abstractions;
     using NCloud.Utils;
 
     /// <summary>
@@ -34,6 +33,7 @@ namespace NCloud.FileProviders.Support
             var items = files.SelectMany(e => ToFileInfos(e));
             this.Rebuild(items);
         }
+
         /// <summary>
         /// The ToFileInfos.
         /// </summary>

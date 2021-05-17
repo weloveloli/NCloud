@@ -4,14 +4,15 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions
+namespace NCloud.FileProviders.Support
 {
     using System;
 
     /// <summary>
     /// Defines the <see cref="FileProviderAttribute" />.
     /// </summary>
-    public class FileProviderAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    public sealed class FileProviderAttribute : Attribute
     {
         /// <summary>
         /// Gets or sets the Name.
