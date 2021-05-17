@@ -9,18 +9,28 @@ namespace NCloud.EndPoints.FTP
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using FubarDev.FtpServer.BackgroundTransfer;
     using FubarDev.FtpServer.FileSystem;
     using Microsoft.Extensions.FileProviders;
+    using NCloud.FileProviders.Support;
 
     /// <summary>
     /// Defines the <see cref="NCloudFileSystem" />.
     /// </summary>
     public class NCloudFileSystem : IUnixFileSystem
     {
+        /// <summary>
+        /// Defines the fileProvider.
+        /// </summary>
         private readonly IFileProvider fileProvider;
+
+        /// <summary>
+        /// Defines the root.
+        /// </summary>
+        private readonly IUnixDirectoryEntry root;
 
         /// <summary>
         /// Gets a value indicating whether SupportsAppend.
@@ -40,14 +50,67 @@ namespace NCloud.EndPoints.FTP
         /// <summary>
         /// Gets the Root.
         /// </summary>
-        public IUnixDirectoryEntry Root => throw new NotImplementedException();
+        public IUnixDirectoryEntry Root => root;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NCloudFileSystem"/> class.
         /// </summary>
+        /// <param name="fileProvider">The fileProvider<see cref="IFileProvider"/>.</param>
         public NCloudFileSystem(IFileProvider fileProvider)
         {
             this.fileProvider = fileProvider ?? throw new ArgumentNullException(nameof(fileProvider));
+            this.root = new NCloudUnixDirectoryEntry(this.fileProvider.GetFileInfo("/"));
+        }
+
+        /// <summary>
+        /// The OpenReadAsync.
+        /// </summary>
+        /// <param name="fileEntry">The fileEntry<see cref="IUnixFileEntry"/>.</param>
+        /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
+        /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="Task{Stream}"/>.</returns>
+        public Task<Stream> OpenReadAsync(IUnixFileEntry fileEntry, long startPosition, CancellationToken cancellationToken)
+        {
+            var file = (NCloudFileInfoUnixFileEntry)fileEntry;
+            return file.CreateReadStreamAsync(startPosition, null, cancellationToken);
+        }
+
+        /// <summary>
+        /// The GetEntriesAsync.
+        /// </summary>
+        /// <param name="directoryEntry">The directoryEntry<see cref="IUnixDirectoryEntry"/>.</param>
+        /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="Task{IReadOnlyList{IUnixFileSystemEntry}}"/>.</returns>
+        public Task<IReadOnlyList<IUnixFileSystemEntry>> GetEntriesAsync(IUnixDirectoryEntry directoryEntry, CancellationToken cancellationToken)
+        {
+            var directory = (NCloudUnixDirectoryEntry)directoryEntry;
+            var path = directory.GetPath();
+            IReadOnlyList<IUnixFileSystemEntry> entries = this.fileProvider.GetDirectoryContents(path)
+                .Where(e => e.Exists)
+                .Select(e => e.ToEntry())
+                .ToList();
+            return Task.FromResult(entries);
+        }
+
+
+        /// <summary>
+        /// The GetEntryByNameAsync.
+        /// </summary>
+        /// <param name="directoryEntry">The directoryEntry<see cref="IUnixDirectoryEntry"/>.</param>
+        /// <param name="name">The name<see cref="string"/>.</param>
+        /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="Task{IUnixFileSystemEntry}"/>.</returns>
+        public Task<IUnixFileSystemEntry> GetEntryByNameAsync(IUnixDirectoryEntry directoryEntry, string name, CancellationToken cancellationToken)
+        {
+            var directory = (NCloudUnixDirectoryEntry)directoryEntry;
+            var path = directory.GetPath();
+            var filePath = path + "/" + name;
+            if (path.EndsWith("/"))
+            {
+                filePath = path + name;
+            }
+            var fileInfo = this.fileProvider.GetFileInfo(filePath);
+            return Task.FromResult(fileInfo.ToEntry());
         }
 
         /// <summary>
@@ -89,29 +152,6 @@ namespace NCloud.EndPoints.FTP
         }
 
         /// <summary>
-        /// The GetEntriesAsync.
-        /// </summary>
-        /// <param name="directoryEntry">The directoryEntry<see cref="IUnixDirectoryEntry"/>.</param>
-        /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
-        /// <returns>The <see cref="Task{IReadOnlyList{IUnixFileSystemEntry}}"/>.</returns>
-        public Task<IReadOnlyList<IUnixFileSystemEntry>> GetEntriesAsync(IUnixDirectoryEntry directoryEntry, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// The GetEntryByNameAsync.
-        /// </summary>
-        /// <param name="directoryEntry">The directoryEntry<see cref="IUnixDirectoryEntry"/>.</param>
-        /// <param name="name">The name<see cref="string"/>.</param>
-        /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
-        /// <returns>The <see cref="Task{IUnixFileSystemEntry}"/>.</returns>
-        public Task<IUnixFileSystemEntry> GetEntryByNameAsync(IUnixDirectoryEntry directoryEntry, string name, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// The MoveAsync.
         /// </summary>
         /// <param name="parent">The parent<see cref="IUnixDirectoryEntry"/>.</param>
@@ -121,18 +161,6 @@ namespace NCloud.EndPoints.FTP
         /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="Task{IUnixFileSystemEntry}"/>.</returns>
         public Task<IUnixFileSystemEntry> MoveAsync(IUnixDirectoryEntry parent, IUnixFileSystemEntry source, IUnixDirectoryEntry target, string fileName, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// The OpenReadAsync.
-        /// </summary>
-        /// <param name="fileEntry">The fileEntry<see cref="IUnixFileEntry"/>.</param>
-        /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
-        /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
-        /// <returns>The <see cref="Task{Stream}"/>.</returns>
-        public Task<Stream> OpenReadAsync(IUnixFileEntry fileEntry, long startPosition, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

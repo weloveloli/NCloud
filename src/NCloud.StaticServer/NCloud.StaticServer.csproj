@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NCloud.EndPoints.FTP\NCloud.EndPoints.FTP.csproj" />
     <ProjectReference Include="..\NCloud.EndPoints.Static\NCloud.EndPoints.Static.csproj" />
   </ItemGroup>
 

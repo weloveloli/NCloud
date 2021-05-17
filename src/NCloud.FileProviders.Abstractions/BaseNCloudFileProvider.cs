@@ -18,13 +18,13 @@ namespace NCloud.FileProviders.Abstractions
     {
         /// <summary>
         /// Gets the Config
-        /// Gets or sets the Config.......
+        /// Gets or sets the Config........
         /// </summary>
         public string Config => this.config;
 
         /// <summary>
         /// Gets the Prefix
-        /// Gets or sets the Protocal.......
+        /// Gets or sets the Protocal........
         /// </summary>
         public string Prefix => this.prefix;
 

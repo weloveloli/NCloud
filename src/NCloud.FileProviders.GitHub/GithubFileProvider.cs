@@ -118,11 +118,11 @@ namespace NCloud.FileProviders.GitHub
             {
                 if (item.Content != null)
                 {
-                    return new RemoteFileInfo(item.DownloadUrl, new InMemoryFileInfo(item.Path, item.Content, item.Name, true));
+                    return new HttpRemoteFileInfo(item.DownloadUrl, new InMemoryFileInfo(item.Path, item.Content, item.Name, true), httpClient);
                 }
                 else
                 {
-                    return new RemoteFileInfo(item.DownloadUrl, new VirtualFileInfo(item.Path, false, item.Size), httpClient);
+                    return new HttpRemoteFileInfo(item.DownloadUrl, new VirtualFileInfo(item.Path, false, item.Size), httpClient);
                 }
 
             }

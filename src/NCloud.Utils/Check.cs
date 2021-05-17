@@ -230,5 +230,30 @@ namespace NCloud.Utils
 
             return value;
         }
+
+        /// <summary>
+        /// The CheckParameter.
+        /// </summary>
+        /// <param name="startPoint">The startPoint<see cref="long"/>.</param>
+        /// <param name="endPoint">The endPoint<see cref="long?"/>.</param>
+        /// <param name="length">The length<see cref="long?"/>.</param>
+        public static void CheckIndex(long startPoint, long? endPoint, long? length)
+        {
+            if (startPoint < 0)
+            {
+                throw new ArgumentException($"{nameof(startPoint)} is invalid, must be large than or equal to 0!");
+            }
+            NotNull(length, nameof(length));
+            var maxSize = (long)length;
+            var right = endPoint ?? maxSize;
+            if (right > maxSize)
+            {
+                throw new ArgumentException($"{nameof(endPoint)} is invalid, must be less than or equal to {maxSize}!");
+            }
+            if (right < startPoint)
+            {
+                throw new ArgumentException($"{nameof(endPoint)} is invalid, must be less than or equal to {maxSize}!");
+            }
+        }
     }
 }

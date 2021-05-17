@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.FileProviders.Abstractions
+namespace NCloud.FileProviders.Support
 {
     using System;
     using System.IO;
@@ -18,7 +18,7 @@ namespace NCloud.FileProviders.Abstractions
         /// <summary>
         /// Defines the fileInfo.
         /// </summary>
-        private readonly IFileInfo fileInfo;
+        protected readonly IFileInfo fileInfo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileInfoDecorator"/> class.

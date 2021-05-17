@@ -96,7 +96,7 @@ namespace NCloud.FileProviders.Virtual
             }
             else
             {
-                return new RemoteFileInfo(setting.Url, new VirtualFileInfo(path, false), client);
+                return new HttpRemoteFileInfo(setting.Url, new VirtualFileInfo(path, false), client);
             }
         }
     }

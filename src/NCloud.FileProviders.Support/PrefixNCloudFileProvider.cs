@@ -80,6 +80,10 @@ namespace NCloud.FileProviders.Support
                 return new NotFoundFileInfo(subPath);
             }
             subPath = subPath.EnsureStartsWith('/');
+            if (subPath == prefix)
+            {
+                return new VirtualFileInfo(subPath);
+            }
             try
             {
                 var fileInfo = this.GetFileInfoByRelPath(GetRelPath(subPath));
