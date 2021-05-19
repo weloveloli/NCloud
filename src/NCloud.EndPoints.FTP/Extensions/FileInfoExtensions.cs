@@ -4,7 +4,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace NCloud.EndPoints.FTP
+namespace NCloud.EndPoints.FTP.Extensions
 {
     using FubarDev.FtpServer.FileSystem;
     using Microsoft.Extensions.FileProviders;

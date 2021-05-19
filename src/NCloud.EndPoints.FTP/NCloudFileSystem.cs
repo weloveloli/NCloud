@@ -15,6 +15,7 @@ namespace NCloud.EndPoints.FTP
     using FubarDev.FtpServer.BackgroundTransfer;
     using FubarDev.FtpServer.FileSystem;
     using Microsoft.Extensions.FileProviders;
+    using NCloud.EndPoints.FTP.Extensions;
     using NCloud.FileProviders.Support;
 
     /// <summary>

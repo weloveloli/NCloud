@@ -17,6 +17,7 @@ namespace NCloud.StaticServer
     using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.GitHub;
     using NCloud.FileProviders.Support;
+    using NCloud.StaticServer.Configuration;
     using NCloud.Utils;
 
     /// <summary>
@@ -44,6 +45,7 @@ namespace NCloud.StaticServer
         /// <param name="services">The services<see cref="IServiceCollection"/>.</param>
         public void ConfigureServices(IServiceCollection services)
         {
+            var ncloud = Configuration.GetSection("NCloud").Get<NCloudStaticServerOptions>();
             services.AddHttpClient();
             services.AddSingleton<GitHubClient>();
             services.AddSingleton<INCloudDynamicFileProvider, DefaultNCloudDynamicFileProvider>();
@@ -51,7 +53,7 @@ namespace NCloud.StaticServer
             services.AddSingleton<IContentTypeProvider, MimeContentTypeProvider>();
             services.AddDirectoryBrowser();
             services.AddControllersWithViews();
-            services.AddNCloudFtpServer<INCloudDynamicFileProvider>().AddHostedService<NCloudHostedFtpService>();
+            services.AddNCloudFtpServer<INCloudDynamicFileProvider>(ncloud.Ftp).AddHostedService<NCloudHostedFtpService>();
         }
 
         /// <summary>
