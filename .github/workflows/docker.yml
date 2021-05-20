@@ -1,0 +1,19 @@
+name: Publish to Registry
+on:    
+  release:
+      types: [published]
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Publish to Registry
+      pre: echo ::save-state name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: weloveloli/Ncloud
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        registry: docker.pkg.github.com
+        workdir: ./src/NCloud.StaticServer
+        tags: "latest,${{ env.STATE_RELEASE_VERSION }}"
