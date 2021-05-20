@@ -17,5 +17,10 @@ namespace NCloud.StaticServer.Configuration
         /// Gets or sets the Ftp.
         /// </summary>
         public FtpOptions Ftp { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the ftp endpoint is Enable.
+        /// </summary>
+        public bool FtpEnable { get; set; }
     }
 }

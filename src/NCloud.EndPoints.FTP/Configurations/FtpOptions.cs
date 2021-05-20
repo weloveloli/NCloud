@@ -12,12 +12,6 @@ namespace NCloud.EndPoints.FTP.Configurations
     public class FtpOptions
     {
         /// <summary>
-        /// Gets or sets a value indicating whether the ftp endpoint is Enable.
-        /// </summary>
-        public bool Enable { get; set; }
-
-
-        /// <summary>
         /// Gets or sets authentication providers to use.
         /// </summary>
         public MembershipProviderType Authentication { get; set; } = MembershipProviderType.Default;
