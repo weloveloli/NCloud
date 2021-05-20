@@ -10,9 +10,10 @@ jobs:
     - name: Publish to Registry
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
-        name: weloveloli/Ncloud
+        name: weloveloli/NcloudStatic
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         registry: docker.pkg.github.com
-        workdir: ./src/NCloud.StaticServer
+        workdir: src
+        dockerfile: NCloud.StaticServer/Dockerfile
         tags: "latest,${{ env.STATE_RELEASE_VERSION }}"
