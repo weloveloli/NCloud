@@ -1,0 +1,10 @@
+version: '2.0'
+services:
+  ncloudstatic:
+    image: weloveloli/ncloud-static:latest
+    volumes:
+        - ncloudstatic:/data
+    ports:
+        - "80:80"
+    environment: 
+        NCloud__Ftp__Enable: "false"

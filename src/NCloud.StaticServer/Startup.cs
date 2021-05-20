@@ -53,7 +53,10 @@ namespace NCloud.StaticServer
             services.AddSingleton<IContentTypeProvider, MimeContentTypeProvider>();
             services.AddDirectoryBrowser();
             services.AddControllersWithViews();
-            services.AddNCloudFtpServer<INCloudDynamicFileProvider>(ncloud.Ftp).AddHostedService<NCloudHostedFtpService>();
+            if (ncloud.FtpEnable)
+            {
+                services.AddNCloudFtpServer<INCloudDynamicFileProvider>(ncloud.Ftp).AddHostedService<NCloudHostedFtpService>();
+            }
         }
 
         /// <summary>
