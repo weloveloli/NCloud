@@ -48,14 +48,14 @@ namespace NCloud.StaticServer
             var ncloud = Configuration.GetSection("NCloud").Get<NCloudStaticServerOptions>();
             services.AddHttpClient();
             services.AddSingleton<GitHubClient>();
-            services.AddSingleton<INCloudDynamicFileProvider, DefaultNCloudDynamicFileProvider>();
+            services.AddSingleton<INCloudFileProviderRegistry, DefaultNCloudFileProviderRegistry>();
             services.AddSingleton<INCloudFileProviderFactory, DefaultNCloudFileProviderFactory>();
             services.AddSingleton<IContentTypeProvider, MimeContentTypeProvider>();
             services.AddDirectoryBrowser();
             services.AddControllersWithViews();
             if (ncloud.FtpEnable)
             {
-                services.AddNCloudFtpServer<INCloudDynamicFileProvider>(ncloud.Ftp).AddHostedService<NCloudHostedFtpService>();
+                services.AddNCloudFtpServer<INCloudFileProviderRegistry>(ncloud.Ftp).AddHostedService<NCloudHostedFtpService>();
             }
         }
 
@@ -80,7 +80,7 @@ namespace NCloud.StaticServer
             app.UseHttpsRedirection();
             var service = app.ApplicationServices;
             var fileProvider = service.GetService<INCloudFileProviderFactory>();
-            var dynamicFileProvider = service.GetService<INCloudDynamicFileProvider>();
+            var dynamicFileProvider = service.GetService<INCloudFileProviderRegistry>();
             dynamicFileProvider.AddProvider(fileProvider.CreateProvider("github:weloveloli/NCloud", "/github"));
             dynamicFileProvider.AddProvider(fileProvider.CreateProvider($"fs:{env.WebRootPath.ToPosixPath()}", ""));
             app.UseStaticFiles(new StaticFileOptions

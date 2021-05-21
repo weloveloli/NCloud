@@ -40,7 +40,7 @@ namespace NCloud.FileProviders.SupportTests
         public void DefaultNCloudFileProviderFactoryTest()
         {
             var factory = new DefaultNCloudFileProviderFactory(provider);
-            var registration = new DefaultNCloudDynamicFileProvider();
+            var registration = new DefaultNCloudFileProviderRegistry();
             registration.AddProvider( factory.CreateProvider("test:/123.txt;/abc/123.txt;/abc/124.txt;/abc/125.txt;/efd/125.txt;/abc/efd/125.txt", "/test"));
             registration.AddProvider(factory.CreateProvider("test:/124.txt;/abc/124.txt", "/test2"));
             var root = registration.GetDirectoryContents("/");

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="IFileProviderRegistration.cs" company="Weloveloli">
+// <copyright file="INCloudFileProviderRegistry.cs" company="Weloveloli">
 //    Copyright (c) 2021 weloveloli. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -10,9 +10,9 @@ namespace NCloud.FileProviders.Abstractions
     using Microsoft.Extensions.FileProviders;
 
     /// <summary>
-    /// Defines the <see cref="INCloudDynamicFileProvider" />.
+    /// Defines the <see cref="INCloudFileProviderRegistry" />.
     /// </summary>
-    public interface INCloudDynamicFileProvider : IFileProvider
+    public interface INCloudFileProviderRegistry : IFileProvider
     {
         /// <summary>
         /// The AddProvider.

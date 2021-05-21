@@ -18,7 +18,7 @@ namespace NCloud.FileProviders.Support
     /// <summary>
     /// Defines the <see cref="EmbeddableCompositeNCloudFileProvider" />.
     /// </summary>
-    public abstract class EmbeddableCompositeNCloudFileProvider : BaseNCloudFileProvider, INCloudDynamicFileProvider
+    public abstract class EmbeddableCompositeNCloudFileProvider : BaseNCloudFileProvider, INCloudFileProviderRegistry
     {
         /// <summary>
         /// Defines the factory.
@@ -124,7 +124,7 @@ namespace NCloud.FileProviders.Support
         /// <param name="sub">The sub<see cref="IEnumerable{IFileInfo}"/>.</param>
         protected bool TryResolveEmbedded(IEnumerable<IFileInfo> sub)
         {
-            if(sub.Any(e => e is EmbeddedFileInfo))
+            if (sub.Any(e => e is EmbeddedFileInfo))
             {
                 var embeded = sub
                 .Where(e => e is EmbeddedFileInfo)
