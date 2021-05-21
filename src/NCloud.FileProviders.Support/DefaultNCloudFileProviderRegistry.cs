@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="DefaultNCloudDynamicFileProvider.cs" company="Weloveloli">
+// <copyright file="DefaultNCloudFileProviderRegistry.cs" company="Weloveloli">
 //    Copyright (c) 2021 weloveloli. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -15,9 +15,9 @@ namespace NCloud.FileProviders.Support
     using NCloud.Utils;
 
     /// <summary>
-    /// Defines the <see cref="DefaultNCloudDynamicFileProvider" />.
+    /// Defines the <see cref="DefaultNCloudFileProviderRegistry" />.
     /// </summary>
-    public class DefaultNCloudDynamicFileProvider : INCloudDynamicFileProvider
+    public class DefaultNCloudFileProviderRegistry : INCloudFileProviderRegistry
     {
         /// <summary>
         /// Defines the _providers.
@@ -30,9 +30,9 @@ namespace NCloud.FileProviders.Support
         protected CompositeFileProvider _compositeFileProvider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultNCloudDynamicFileProvider"/> class.
+        /// Initializes a new instance of the <see cref="DefaultNCloudFileProviderRegistry"/> class.
         /// </summary>
-        public DefaultNCloudDynamicFileProvider()
+        public DefaultNCloudFileProviderRegistry()
         {
             this._providers = new Dictionary<string, BaseNCloudFileProvider>();
         }

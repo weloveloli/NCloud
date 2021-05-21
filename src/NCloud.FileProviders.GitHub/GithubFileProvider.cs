@@ -10,7 +10,6 @@ namespace NCloud.FileProviders.GitHub
     using System.Linq;
     using System.Net.Http;
     using Microsoft.Extensions.FileProviders;
-    using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.Support;
 
     /// <summary>

@@ -32,15 +32,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.FileProviders.Virtua
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.UtilsTests", "NCloud.UtilsTests\NCloud.UtilsTests.csproj", "{F7241C5B-C816-4057-980D-AEB0FC053EB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCloud.EndPoints.Common", "NCloud.EndPoints.Common\NCloud.EndPoints.Common.csproj", "{3E8C703C-D83D-4A7C-90DD-8119CBA9E28F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.EndPoints.Common", "NCloud.EndPoints.Common\NCloud.EndPoints.Common.csproj", "{3E8C703C-D83D-4A7C-90DD-8119CBA9E28F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCloud.EndPoints.Static", "NCloud.EndPoints.Static\NCloud.EndPoints.Static.csproj", "{2314DEF7-5747-47A5-B0B2-4A0AFA9D81DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.EndPoints.Static", "NCloud.EndPoints.Static\NCloud.EndPoints.Static.csproj", "{2314DEF7-5747-47A5-B0B2-4A0AFA9D81DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCloud.EndPoints.FTP", "NCloud.EndPoints.FTP\NCloud.EndPoints.FTP.csproj", "{0C37E7CE-1642-4181-B707-94B90868008A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.EndPoints.FTP", "NCloud.EndPoints.FTP\NCloud.EndPoints.FTP.csproj", "{0C37E7CE-1642-4181-B707-94B90868008A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCloud.FileProviders.Support", "NCloud.FileProviders.Support\NCloud.FileProviders.Support.csproj", "{FD6AD081-1FFE-478C-9D71-C9B2B8C0489B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.FileProviders.Support", "NCloud.FileProviders.Support\NCloud.FileProviders.Support.csproj", "{FD6AD081-1FFE-478C-9D71-C9B2B8C0489B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.FileProviders.SupportTests", "NCloud.FileProviders.SupportTests\NCloud.FileProviders.SupportTests.csproj", "{1BE1A04E-2A75-43F9-85F5-2F3A9C91CDEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCloud.Core", "NCloud.Core\NCloud.Core.csproj", "{D45EC876-7484-417B-8CFE-A40FF225B598}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -244,6 +246,18 @@ Global
 		{1BE1A04E-2A75-43F9-85F5-2F3A9C91CDEB}.Release|x64.Build.0 = Release|Any CPU
 		{1BE1A04E-2A75-43F9-85F5-2F3A9C91CDEB}.Release|x86.ActiveCfg = Release|Any CPU
 		{1BE1A04E-2A75-43F9-85F5-2F3A9C91CDEB}.Release|x86.Build.0 = Release|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Debug|x64.Build.0 = Debug|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Debug|x86.Build.0 = Debug|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Release|x64.ActiveCfg = Release|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Release|x64.Build.0 = Release|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Release|x86.ActiveCfg = Release|Any CPU
+		{D45EC876-7484-417B-8CFE-A40FF225B598}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

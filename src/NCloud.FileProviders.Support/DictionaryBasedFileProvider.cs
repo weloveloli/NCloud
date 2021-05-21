@@ -65,7 +65,7 @@ namespace NCloud.FileProviders.Support
                 return new VirtualFileInfo(relpath);
             }
 
-            return Files.GetOrDefault(NormalizePath(relpath))?? new NotFoundFileInfo(relpath);
+            return Files.GetOrDefault(NormalizePath(relpath)) ?? new NotFoundFileInfo(relpath);
         }
 
         /// <summary>
