@@ -5,6 +5,8 @@ VisualStudioVersion = 16.6.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{635BF1D9-4C34-41CC-BB9C-FF6D76F09379}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
 		NCloud.header = NCloud.header
 	EndProjectSection
 EndProject
@@ -42,7 +44,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.FileProviders.Suppor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.FileProviders.SupportTests", "NCloud.FileProviders.SupportTests\NCloud.FileProviders.SupportTests.csproj", "{1BE1A04E-2A75-43F9-85F5-2F3A9C91CDEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCloud.Core", "NCloud.Core\NCloud.Core.csproj", "{D45EC876-7484-417B-8CFE-A40FF225B598}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.Core", "NCloud.Core\NCloud.Core.csproj", "{D45EC876-7484-417B-8CFE-A40FF225B598}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

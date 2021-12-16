@@ -1,0 +1,33 @@
+<Project>
+	<PropertyGroup>
+		<Authors>esfaj47</Authors>
+		<Company>weloveloli.</Company>
+		<Product>NCloud</Product>
+		<Copyright>Copyright (c) 2021 weloveloli.</Copyright>
+		<RepositoryUrl>https://github.com/weloveloli/NCloud</RepositoryUrl>
+		<RepositoryType>Git</RepositoryType>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/weloveloli/NCloud</PackageProjectUrl>
+		<PackageIcon>cloud.png</PackageIcon>
+		<PackageOutputPath>../nupkgs</PackageOutputPath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<DocumentationFile>$(MSBuildProjectName).xml</DocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="icon.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+</Project>
