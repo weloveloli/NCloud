@@ -18,7 +18,8 @@ namespace NCloud.FileProviders.Support
     /// <summary>
     /// Defines the <see cref="EmbeddableCompositeNCloudFileProvider" />.
     /// </summary>
-    public abstract class EmbeddableCompositeNCloudFileProvider : BaseNCloudFileProvider, INCloudFileProviderRegistry
+    public abstract class EmbeddableCompositeNCloudFileProvider<IProviderConfigType> : BaseNCloudFileProvider<IProviderConfigType>, INCloudFileProviderRegistry
+            where IProviderConfigType : BaseProviderConfig, IEmbeddableProviderConfig, new()
     {
         /// <summary>
         /// Defines the factory.
@@ -28,7 +29,7 @@ namespace NCloud.FileProviders.Support
         /// <summary>
         /// Defines the _providers.
         /// </summary>
-        private IDictionary<string, BaseNCloudFileProvider> _providers;
+        private IDictionary<string, INCloudFileProvider> _providers;
 
         /// <summary>
         /// Defines the _compositeFileProvider.
@@ -38,7 +39,7 @@ namespace NCloud.FileProviders.Support
         /// <summary>
         /// Defines the logger.
         /// </summary>
-        private ILogger<EmbeddableCompositeNCloudFileProvider> logger;
+        private ILogger<EmbeddableCompositeNCloudFileProvider<IProviderConfigType>> logger;
 
         /// <summary>
         /// Defines the lazyLoaded.
@@ -53,16 +54,14 @@ namespace NCloud.FileProviders.Support
         /// <summary>
         /// Initializes a new instance of the <see cref="EmbeddableCompositeNCloudFileProvider"/> class.
         /// </summary>
-        /// <param name="lazyLoaded">The lazyLoaded<see cref="bool"/>.</param>
         /// <param name="serviceProvider">The serviceProvider<see cref="IServiceProvider"/>.</param>
         /// <param name="config">The config<see cref="string"/>.</param>
-        /// <param name="prefix">The prefix<see cref="string"/>.</param>
-        public EmbeddableCompositeNCloudFileProvider(bool lazyLoaded, IServiceProvider serviceProvider, string config, string prefix) : base(serviceProvider, config, prefix)
+        public EmbeddableCompositeNCloudFileProvider(IServiceProvider serviceProvider, IProviderConfigType config) : base(serviceProvider, config)
         {
-            this.lazyload = lazyLoaded;
-            this.logger = serviceProvider.GetService<ILogger<EmbeddableCompositeNCloudFileProvider>>();
+            this.lazyload = config.IsLasyLoad();
+            this.logger = serviceProvider.GetService<ILogger<EmbeddableCompositeNCloudFileProvider<IProviderConfigType>>>();
             this.factory = serviceProvider.GetService<INCloudFileProviderFactory>();
-            this._providers = new Dictionary<string, BaseNCloudFileProvider>();
+            this._providers = new Dictionary<string, INCloudFileProvider>();
             this._compositeFileProvider = RebuildCompositeProviders();
             this.loadedPrefixs = new HashSet<string>();
         }
@@ -70,11 +69,11 @@ namespace NCloud.FileProviders.Support
         /// <summary>
         /// The CreateProvider.
         /// </summary>
-        /// <param name="providers">The providers<see cref="BaseNCloudFileProvider[]"/>.</param>
+        /// <param name="providers">The providers.</param>
         /// <returns>The <see cref="BaseNCloudFileProvider"/>.</returns>
-        public bool AddProvider(params BaseNCloudFileProvider[] providers)
+        public bool AddProvider(params INCloudFileProvider[] providers)
         {
-            var added = providers.Select((provider) => this._providers.TryAdd(provider.Config, provider)).Any(e => e);
+            var added = providers.Select((provider) => this._providers.TryAdd(provider.Key, provider)).Any(e => e);
             if (added)
             {
                 this._compositeFileProvider = RebuildCompositeProviders();
@@ -85,7 +84,7 @@ namespace NCloud.FileProviders.Support
         /// <summary>
         /// The RemoveProvider.
         /// </summary>
-        /// <param name="config">The config<see cref="IEnumerable{string}"/>.</param>
+        /// <param name="config">The config<see cref="IEnumerable{String}"/>.</param>
         public void RemoveProvider(IEnumerable<string> config)
         {
             var changed = config.Select(e => this._providers.Remove(e)).Any(e => e);
@@ -134,13 +133,14 @@ namespace NCloud.FileProviders.Support
                 {
                     return false;
                 }
-                var providers = new List<BaseNCloudFileProvider>();
+                var providers = new List<INCloudFileProvider>();
                 foreach (var embed in embeded)
                 {
                     var config = embed.GetProviderConfig();
                     try
                     {
-                        var provider = factory.CreateProvider(config, embed.Prefix);
+                        var provider = factory.CreateProvider(config);
+                        config.Prefix = embed.Prefix;
                         if (provider != null)
                         {
                             providers.Add(provider);

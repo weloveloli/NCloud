@@ -41,8 +41,10 @@ namespace NCloud.FileProviders.SupportTests
         {
             var factory = new DefaultNCloudFileProviderFactory(provider);
             var registration = new DefaultNCloudFileProviderRegistry();
-            registration.AddProvider( factory.CreateProvider("test:/123.txt;/abc/123.txt;/abc/124.txt;/abc/125.txt;/efd/125.txt;/abc/efd/125.txt", "/test"));
-            registration.AddProvider(factory.CreateProvider("test:/124.txt;/abc/124.txt", "/test2"));
+
+            registration.AddProvider(
+                factory.CreateProvider(new TestFileProviderConfig { Settings = "/123.txt;/abc/123.txt;/abc/124.txt;/abc/125.txt;/efd/125.txt;/abc/efd/125.txt", Prefix = "/test" }),
+                factory.CreateProvider(new TestFileProviderConfig { Settings = "/124.txt;/abc/124.txt", Prefix = "/test2" }));
             var root = registration.GetDirectoryContents("/");
             Assert.AreEqual(2, root.Count());
             var content = registration.GetDirectoryContents("/test");

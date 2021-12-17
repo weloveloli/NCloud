@@ -30,4 +30,4 @@
               url: https://cdimage.debian.org/cdimage/archive/8.11.0/amd64/iso-dvd/debian-8.11.0-amd64-DVD-1.iso
 -
   name: test
-  content: test:/124.txt;/abc/124.txt
+  content: "{\"Type\":\"test\",\"Settings\":\"/124.txt;/abc/124.txt\"}"

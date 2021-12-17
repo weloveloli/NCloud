@@ -6,6 +6,7 @@
 
 namespace NCloud.StaticServer
 {
+    using System.Collections.Generic;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.StaticFiles;
@@ -18,7 +19,7 @@ namespace NCloud.StaticServer
     using NCloud.FileProviders.GitHub;
     using NCloud.FileProviders.Support;
     using NCloud.StaticServer.Configuration;
-    using NCloud.Utils;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Defines the <see cref="Startup" />.
@@ -81,8 +82,13 @@ namespace NCloud.StaticServer
             var service = app.ApplicationServices;
             var fileProvider = service.GetService<INCloudFileProviderFactory>();
             var dynamicFileProvider = service.GetService<INCloudFileProviderRegistry>();
-            dynamicFileProvider.AddProvider(fileProvider.CreateProvider("github:weloveloli/NCloud", "/github"));
-            dynamicFileProvider.AddProvider(fileProvider.CreateProvider($"fs:{env.WebRootPath.ToPosixPath()}", ""));
+            var storeConfig = Configuration.GetSection("Store").Get<List<Dictionary<string,string>>>();
+            var stores = JsonConvert.DeserializeObject<List<BaseProviderConfig>>(JsonConvert.SerializeObject(storeConfig), new ProviderConfigConverter());
+            foreach (var store in stores)
+            {
+                dynamicFileProvider.AddProvider(fileProvider.CreateProvider(store));
+            }
+
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = dynamicFileProvider,

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="LamdaEqual.cs" company="Weloveloli">
+// <copyright file="LambdaEqual.cs" company="Weloveloli">
 //    Copyright (c) 2021 weloveloli. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -20,12 +20,16 @@ namespace NCloud.Utils
         /// </summary>
         public Func<T, T, bool> comparer;
 
+        /// <summary>
+        /// Defines the hashCoder.
+        /// </summary>
         public Func<T, int> hashCoder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LambdaEqual{T}"/> class.
         /// </summary>
         /// <param name="comparer">The comparer<see cref="Func{T, T, bool}"/>.</param>
+        /// <param name="hashCoder">The hashCoder<see cref="Func{T, int}"/>.</param>
         public LambdaEqual(Func<T, T, bool> comparer, Func<T, int> hashCoder)
         {
             this.comparer = comparer;
@@ -35,11 +39,11 @@ namespace NCloud.Utils
         /// <summary>
         /// Initializes a new instance of the <see cref="LambdaEqual{T}"/> class.
         /// </summary>
-        /// <param name="comparer">The comparer<see cref="Func{T, T, bool}"/>.</param>
+        /// <param name="propertySelector">The propertySelector<see cref="Func{T, string}"/>.</param>
         public LambdaEqual(Func<T, string> propertySelector)
         {
-            this.comparer = (a,b)=>propertySelector(a) == propertySelector(b);
-            this.hashCoder = (a) =>propertySelector(a).GetHashCode();
+            this.comparer = (a, b) => propertySelector(a) == propertySelector(b);
+            this.hashCoder = (a) => propertySelector(a).GetHashCode();
         }
 
         /// <summary>

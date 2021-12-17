@@ -3,7 +3,8 @@
 		<Authors>esfaj47</Authors>
 		<Company>weloveloli.</Company>
 		<Product>NCloud</Product>
-		<Copyright>Copyright (c) 2021 weloveloli.</Copyright>
+		<Copyright>Copyright (c) $([System.DateTime]::Now.Year) NCloud.</Copyright>
+    <Version>1.$([System.DateTime]::Now.ToString(yyyy.MMdd.HHmm))</Version>
 		<RepositoryUrl>https://github.com/weloveloli/NCloud</RepositoryUrl>
 		<RepositoryType>Git</RepositoryType>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -16,15 +17,11 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<DocumentationFile>$(MSBuildProjectName).xml</DocumentationFile>
-	</PropertyGroup>
-
-	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="icon.png">
+		<None Include="../cloud.png">
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>

@@ -9,39 +9,28 @@ namespace NCloud.FileProviders.Abstractions
     using System;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Primitives;
-    using NCloud.Utils;
 
     /// <summary>
-    /// Defines the <see cref="BaseNCloudFileProvider" />.
+    /// Defines the <see cref="BaseNCloudFileProvider{IProviderConfigType}" />.
     /// </summary>
-    public abstract class BaseNCloudFileProvider : IFileProvider
+    /// <typeparam name="IProviderConfigType">.</typeparam>
+    public abstract class BaseNCloudFileProvider<IProviderConfigType> : INCloudFileProvider
+        where IProviderConfigType : BaseProviderConfig, new()
     {
         /// <summary>
-        /// Gets the Config
-        /// Gets or sets the Config........
+        /// Gets the Config.
         /// </summary>
-        public string Config => this.config;
+        public IProviderConfigType Config => this.config;
 
         /// <summary>
-        /// Gets the Prefix
-        /// Gets or sets the Protocal........
+        /// Gets the Prefix.
         /// </summary>
-        public string Prefix => this.prefix;
+        public string Prefix => config.Prefix;
 
         /// <summary>
         /// Defines the config.
         /// </summary>
-        protected readonly string config;
-
-        /// <summary>
-        /// Defines the prefix.
-        /// </summary>
-        protected readonly string prefix;
-
-        /// <summary>
-        /// Defines the setting.
-        /// </summary>
-        protected readonly string setting;
+        protected readonly IProviderConfigType config;
 
         /// <summary>
         /// Defines the provider.
@@ -49,26 +38,14 @@ namespace NCloud.FileProviders.Abstractions
         protected readonly IServiceProvider provider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BaseNCloudFileProvider"/> class.
+        /// Initializes a new instance of the <see cref="BaseNCloudFileProvider{IProviderConfigType}"/> class.
         /// </summary>
         /// <param name="provider">The provider<see cref="IServiceProvider"/>.</param>
         /// <param name="config">The config<see cref="string"/>.</param>
-        /// <param name="prefix">The prefix<see cref="string"/>.</param>
-        protected BaseNCloudFileProvider(IServiceProvider provider, string config, string prefix)
+        protected BaseNCloudFileProvider(IServiceProvider provider, IProviderConfigType config)
         {
             this.provider = provider;
             this.config = config;
-            this.prefix = prefix.EnsureStartsWith('/');
-            if (!string.IsNullOrEmpty(config))
-            {
-                var configs = config.Split(":");
-                // fs:./example
-                this.setting = configs.Length == 2 ? configs[1] : string.Empty;
-            }
-            else
-            {
-                this.setting = string.Empty;
-            }
         }
 
         /// <summary>
@@ -94,5 +71,11 @@ namespace NCloud.FileProviders.Abstractions
         {
             return NullChangeToken.Singleton;
         }
+
+        /// <summary>
+        /// Gets the Key
+        /// The Key..
+        /// </summary>
+        public string Key => this.config.HashKey();
     }
 }

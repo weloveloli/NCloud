@@ -11,6 +11,8 @@ namespace NCloud.FileProviders.Support
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
     using NCloud.FileProviders.Abstractions;
     using NCloud.Utils;
 
@@ -25,9 +27,14 @@ namespace NCloud.FileProviders.Support
         private readonly IServiceProvider serviceProvider;
 
         /// <summary>
+        /// Defines the logger.
+        /// </summary>
+        private readonly ILogger<DefaultNCloudFileProviderFactory> logger;
+
+        /// <summary>
         /// Defines the _providers.
         /// </summary>
-        private IDictionary<string, BaseNCloudFileProvider> _providers;
+        private IDictionary<string, INCloudFileProvider> _providers;
 
         /// <summary>
         /// Defines the _providerTypes.
@@ -45,7 +52,8 @@ namespace NCloud.FileProviders.Support
         /// <param name="serviceProvider">The serviceProvider<see cref="IServiceProvider"/>.</param>
         public DefaultNCloudFileProviderFactory(IServiceProvider serviceProvider)
         {
-            this._providers = new Dictionary<string, BaseNCloudFileProvider>();
+            this.logger = serviceProvider.GetService<ILogger<DefaultNCloudFileProviderFactory>>();
+            this._providers = new Dictionary<string, INCloudFileProvider>();
             this._prefixs = new Dictionary<string, string>();
             var fileProviderAssemblies = new List<Assembly>();
             string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -54,11 +62,11 @@ namespace NCloud.FileProviders.Support
                 fileProviderAssemblies.Add(Assembly.LoadFrom(dll));
             }
             var types = fileProviderAssemblies.SelectMany(e => e.GetExportedTypes())
-                .Where(e => e.IsSubclassOf(typeof(BaseNCloudFileProvider)));
+                .Where(e => e.IsAssignableTo(typeof(INCloudFileProvider)));
             this._providerTypes = types
                 .Where(e => e.GetCustomAttributes(typeof(FileProviderAttribute), false).Length == 1)
-                .Select(e => (((FileProviderAttribute)e.GetCustomAttributes(typeof(FileProviderAttribute), false)[0]).Protocol, e))
-                .ToDictionary(e => e.Protocol, e => e.e);
+                .Select(e => (((FileProviderAttribute)e.GetCustomAttributes(typeof(FileProviderAttribute), false)[0]).Type, e))
+                .ToDictionary(e => e.Type, e => e.e);
             this.serviceProvider = serviceProvider;
         }
 
@@ -66,25 +74,26 @@ namespace NCloud.FileProviders.Support
         /// The CreateProvider.
         /// </summary>
         /// <param name="config">The config<see cref="string"/>.</param>
-        /// <param name="prefix">The prefix<see cref="string"/>.</param>
         /// <returns>The <see cref="PrefixNCloudFileProvider"/>.</returns>
-        public BaseNCloudFileProvider CreateProvider(string config, string prefix = "")
+        public INCloudFileProvider CreateProvider(BaseProviderConfig config)
         {
-            BaseNCloudFileProvider provider = this._providers.GetOrDefault(config);
+            var key = config.HashKey();
+            var provider = this._providers.GetOrDefault(key);
             if (provider != null)
             {
                 return provider;
             }
-            var type = GetDriveType(config);
+            var type = GetDriveType(config.Type);
             try
             {
-                provider = (BaseNCloudFileProvider)Activator.CreateInstance(type, new object[] { serviceProvider, config, prefix });
-                this._providers.Add(config, provider);
-                this._prefixs.Add(config, prefix);
+                provider = (INCloudFileProvider)Activator.CreateInstance(type, new object[] { serviceProvider, config });
+                this._providers.Add(key, provider);
+                this._prefixs.Add(key, config.Prefix);
                 return provider;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                this.logger?.LogError("CreateProvider Failed", e);
                 return null;
             }
         }
@@ -92,23 +101,18 @@ namespace NCloud.FileProviders.Support
         /// <summary>
         /// The GetDriveType.
         /// </summary>
-        /// <param name="config">The config<see cref="string"/>.</param>
+        /// <param name="type">The config<see cref="string"/>.</param>
         /// <returns>The <see cref="Type"/>.</returns>
-        private Type GetDriveType(string config)
+        private Type GetDriveType(string type)
         {
-            if (string.IsNullOrWhiteSpace(config))
+            if (string.IsNullOrWhiteSpace(type))
             {
-                throw new ArgumentException($"'{nameof(config)}' cannot be null or whitespace.", nameof(config));
+                throw new ArgumentException($"'{nameof(type)}' cannot be null or whitespace.", nameof(type));
             }
-            if (!config.Contains(":"))
+            var providerType = _providerTypes.GetOrDefault(type) ?? throw new ArgumentException($"'{nameof(type)}' is invalid, {type} is not support.", nameof(type));
+            if (!providerType.IsAssignableTo(typeof(INCloudFileProvider)))
             {
-                throw new ArgumentException($"'{nameof(config)}' is invalid.", nameof(config));
-            }
-            var protocol = config.Substring(0, config.IndexOf(":"));
-            var providerType = _providerTypes.GetOrDefault(protocol) ?? throw new ArgumentException($"'{nameof(config)}' is invalid, {protocol} is not support.", nameof(config));
-            if (!providerType.IsSubclassOf(typeof(BaseNCloudFileProvider)))
-            {
-                throw new ArgumentException($"'{nameof(providerType)}' {providerType} is invalid, must be subclass of NCloudFileProvider.", nameof(providerType));
+                throw new ArgumentException($"'{nameof(providerType)}' {providerType} is invalid, must be subclass of INCloudFileProvider.", nameof(providerType));
             }
             return providerType;
         }

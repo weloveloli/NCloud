@@ -6,6 +6,7 @@
 
 namespace NCloud.FileProviders.Virtual.Tests
 {
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +15,8 @@ namespace NCloud.FileProviders.Virtual.Tests
     using Moq;
     using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.Support;
-    using NCloud.Utils;
+    using YamlDotNet.Serialization;
+    using YamlDotNet.Serialization.NamingConventions;
 
     /// <summary>
     /// Defines the <see cref="VirtualFileProviderTests" />.
@@ -35,7 +37,7 @@ namespace NCloud.FileProviders.Virtual.Tests
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<INCloudFileProviderFactory, DefaultNCloudFileProviderFactory>();
-            serviceCollection.AddSingleton(new Mock<ILogger<EmbeddableCompositeNCloudFileProvider>> ().Object);
+            serviceCollection.AddSingleton(new Mock<ILogger<EmbeddableCompositeNCloudFileProvider<VirtualProviderConfig>>>().Object);
             this.provider = serviceCollection.BuildServiceProvider();
         }
 
@@ -46,8 +48,14 @@ namespace NCloud.FileProviders.Virtual.Tests
         public void VirtualFileProviderTest()
         {
             var config = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "samples", "sample1.yml"));
-            config = $"virtual:{config.EncodeBase64()}";
-            var v = new VirtualFileProvider(provider, config, "/v");
+            var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+            var fileSettings = deserializer.Deserialize<List<FileSetting>>(config);
+
+            var v = new VirtualFileProvider(provider, new VirtualProviderConfig
+            {
+                Prefix = "/v",
+                FileSettings = fileSettings
+            });
 
             var parent = v.GetDirectoryContents("/");
             Assert.IsTrue(parent.Exists);
@@ -85,8 +93,14 @@ namespace NCloud.FileProviders.Virtual.Tests
         public void VirtualFileProviderTest2()
         {
             var config = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "samples", "sample2.yml"));
-            config = $"virtual:{config.EncodeBase64()}";
-            var v = new VirtualFileProvider(provider, config, "/v");
+            var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+            var fileSettings = deserializer.Deserialize<List<FileSetting>>(config);
+
+            var v = new VirtualFileProvider(provider, new VirtualProviderConfig
+            {
+                Prefix = "/v",
+                FileSettings = fileSettings
+            });
 
             var parent = v.GetDirectoryContents("/");
             Assert.IsTrue(parent.Exists);

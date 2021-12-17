@@ -121,3 +121,9 @@ dotnet_style_qualification_for_property = false:suggestion
 
 # Add copyright file header
 file_header_template = -----------------------------------------------------------------------\n<copyright file="{fileName}" company="Weloveloli">\n   Copyright (c) 2021 weloveloli. All rights reserved.\n</copyright>\n-----------------------------------------------------------------------
+
+# CS1584: XML comment has syntactically incorrect cref attribute
+dotnet_diagnostic.CS1584.severity = none
+
+# CS1658: Warning is overriding an error
+dotnet_diagnostic.CS1658.severity = none

@@ -22,7 +22,7 @@ namespace NCloud.FileProviders.Support
         /// <summary>
         /// Defines the _providers.
         /// </summary>
-        private IDictionary<string, BaseNCloudFileProvider> _providers;
+        private IDictionary<string, INCloudFileProvider> _providers;
 
         /// <summary>
         /// Defines the _compositeFileProvider.
@@ -34,17 +34,25 @@ namespace NCloud.FileProviders.Support
         /// </summary>
         public DefaultNCloudFileProviderRegistry()
         {
-            this._providers = new Dictionary<string, BaseNCloudFileProvider>();
+            this._providers = new Dictionary<string, INCloudFileProvider>();
         }
 
         /// <summary>
         /// The CreateProvider.
         /// </summary>
-        /// <param name="providers">The providers<see cref="BaseNCloudFileProvider[]"/>.</param>
-        /// <returns>The <see cref="BaseNCloudFileProvider"/>.</returns>
-        public bool AddProvider(params BaseNCloudFileProvider[] providers)
+        /// <param name="providers">The providers.</param>
+        /// <returns>The <see cref="INCloudFileProvider"/>.</returns>
+        public bool AddProvider(params INCloudFileProvider[] providers)
         {
-            var added = providers.Select((provider) => this._providers.TryAdd(provider.Config, provider)).Any(e => e);
+            var added = false;
+            foreach (var provider in providers)
+            {
+                if (provider != null)
+                {
+                    added = this._providers.TryAdd(provider.Key, provider) || added;
+                }
+
+            }
             if (added)
             {
                 this._compositeFileProvider = RebuildCompositeProviders();
@@ -55,10 +63,10 @@ namespace NCloud.FileProviders.Support
         /// <summary>
         /// The RemoveProvider.
         /// </summary>
-        /// <param name="config">The config<see cref="IEnumerable{string}"/>.</param>
-        public void RemoveProvider(IEnumerable<string> config)
+        /// <param name="keys">The keys<see cref="IEnumerable{string}"/>.</param>
+        public void RemoveProvider(IEnumerable<string> keys)
         {
-            var changed = config.Select(e => this._providers.Remove(e)).Any(e => e);
+            var changed = keys.Select(e => this._providers.Remove(e)).Any(e => e);
             if (changed)
             {
                 this._compositeFileProvider = RebuildCompositeProviders();

@@ -9,15 +9,14 @@ namespace NCloud.FileProviders.Physical
     using System;
     using System.IO;
     using Microsoft.Extensions.FileProviders;
-    using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.Support;
     using NCloud.Utils;
 
     /// <summary>
     /// Defines the <see cref="PhysicalNCloudFileProvider" />.
     /// </summary>
-    [FileProvider(Name = "fs", Protocol = "fs")]
-    public class PhysicalNCloudFileProvider : PrefixNCloudFileProvider
+    [FileProvider(Name = "fs", Type = "fs")]
+    public class PhysicalNCloudFileProvider : PrefixNCloudFileProvider<PhysicalProviderConfig>
     {
         /// <summary>
         /// Defines the _provider.
@@ -29,10 +28,9 @@ namespace NCloud.FileProviders.Physical
         /// </summary>
         /// <param name="provider">The provider<see cref="IServiceProvider"/>.</param>
         /// <param name="config">The config<see cref="string"/>.</param>
-        /// <param name="prefix">The prefix<see cref="string"/>.</param>
-        public PhysicalNCloudFileProvider(IServiceProvider provider, string config, string prefix) : base(provider, config, prefix)
+        public PhysicalNCloudFileProvider(IServiceProvider provider, PhysicalProviderConfig config) : base(provider, config)
         {
-            var realPath = setting.FromPosixPath();
+            var realPath = config.Path.FromPosixPath();
             if (!Directory.Exists(realPath))
             {
                 throw new ArgumentException($"{realPath} not exist");

@@ -15,7 +15,8 @@ namespace NCloud.FileProviders.Support
     /// <summary>
     /// Defines the <see cref="PrefixNCloudFileProvider" />.
     /// </summary>
-    public abstract class PrefixNCloudFileProvider : BaseNCloudFileProvider
+    public abstract class PrefixNCloudFileProvider<IProviderConfigType> : BaseNCloudFileProvider<IProviderConfigType>
+        where IProviderConfigType : BaseProviderConfig, new()
     {
         /// <summary>
         /// Defines the rootFileInfo.
@@ -27,10 +28,9 @@ namespace NCloud.FileProviders.Support
         /// </summary>
         /// <param name="provider">The provider<see cref="IServiceProvider"/>.</param>
         /// <param name="config">The config<see cref="string"/>.</param>
-        /// <param name="prefix">The prefix<see cref="string"/>.</param>
-        public PrefixNCloudFileProvider(IServiceProvider provider, string config, string prefix) : base(provider, config, prefix)
+        public PrefixNCloudFileProvider(IServiceProvider provider, IProviderConfigType config) : base(provider, config)
         {
-            this.rootFileInfo = new VirtualFileInfo(prefix);
+            this.rootFileInfo = new VirtualFileInfo(Prefix);
         }
 
         /// <summary>
@@ -45,11 +45,11 @@ namespace NCloud.FileProviders.Support
                 return NotFoundDirectoryContents.Singleton;
             }
             subPath = subPath.EnsureStartsWith('/');
-            if (prefix.IsSubpathOf(subPath))
+            if (Prefix.IsSubpathOf(subPath))
             {
                 return new EnumerableDirectoryContents(rootFileInfo);
             }
-            if (!subPath.StartsWith(prefix))
+            if (!subPath.StartsWith(Prefix))
             {
                 return NotFoundDirectoryContents.Singleton;
             }
@@ -75,12 +75,12 @@ namespace NCloud.FileProviders.Support
         /// <returns>The <see cref="IFileInfo"/>.</returns>
         public override IFileInfo GetFileInfo(string subPath)
         {
-            if (subPath == null || !subPath.StartsWith(prefix))
+            if (subPath == null || !subPath.StartsWith(Prefix))
             {
                 return new NotFoundFileInfo(subPath);
             }
             subPath = subPath.EnsureStartsWith('/');
-            if (subPath == prefix)
+            if (subPath == Prefix)
             {
                 return new VirtualFileInfo(subPath);
             }
@@ -116,7 +116,7 @@ namespace NCloud.FileProviders.Support
         /// <returns>The <see cref="string"/>.</returns>
         protected string GetRelPath(string subPath)
         {
-            var relative = subPath.Substring(prefix.Length);
+            var relative = subPath.Substring(Prefix.Length);
             if (relative.StartsWith("/"))
             {
                 relative = relative.Substring(1);

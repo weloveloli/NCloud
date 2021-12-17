@@ -14,14 +14,13 @@ namespace NCloud.FileProviders.Virtual
     using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.Support;
     using NCloud.Utils;
-    using YamlDotNet.Serialization;
-    using YamlDotNet.Serialization.NamingConventions;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Defines the <see cref="VirtualFileProvider" />.
     /// </summary>
-    [FileProvider(Name = "virtual", Protocol = "virtual")]
-    public class VirtualFileProvider : EmbeddableCompositeNCloudFileProvider
+    [FileProvider(Name = "virtual", Type = "virtual")]
+    public class VirtualFileProvider : EmbeddableCompositeNCloudFileProvider<VirtualProviderConfig>
     {
         /// <summary>
         /// Defines the client.
@@ -29,24 +28,31 @@ namespace NCloud.FileProviders.Virtual
         private readonly HttpClient client;
 
         /// <summary>
+        /// Defines the converter.
+        /// </summary>
+        private readonly ProviderConfigConverter converter;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="VirtualFileProvider"/> class.
         /// </summary>
         /// <param name="serviceProvider">The serviceProvider<see cref="IServiceProvider"/>.</param>
         /// <param name="config">The config<see cref="string"/>.</param>
-        /// <param name="prefix">The prefix<see cref="string"/>.</param>
-        public VirtualFileProvider(IServiceProvider serviceProvider, string config, string prefix) : base(false, serviceProvider, config, prefix)
+        public VirtualFileProvider(IServiceProvider serviceProvider, VirtualProviderConfig config) : base(serviceProvider, config)
         {
-            var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
-            var fileSettings = deserializer.Deserialize<List<FileSetting>>(setting.DecodeBase64());
+            this.converter = new ProviderConfigConverter();
             this.client = (HttpClient)serviceProvider.GetService(typeof(HttpClient)) ?? new HttpClient();
-            var fileInfos = new List<IFileInfo> { new VirtualFileInfo(prefix) };
-            this.BuildFileInfos(fileSettings, fileInfos, prefix);
+            var fileInfos = new List<IFileInfo> { new VirtualFileInfo(config.Prefix) };
+            this.BuildFileInfos(config.FileSettings, fileInfos, config.Prefix);
             this.TryResolveEmbedded(fileInfos);
-            var dict = fileInfos
-                .Where(e => !(e is EmbeddedFileInfo))
+            var fileInfoTuples = fileInfos.Where(e => !(e is EmbeddedFileInfo))
                 .Distinct(new LambdaEqual<IFileInfo>(e => e.GetVirtualOrPhysicalPath()))
-                .ToDictionary((e) => e.GetVirtualOrPhysicalPath(), e => e);
-            var inner = new VirtualInnerFileProvider(provider, dict, config, "");
+                .Select(e => (e.GetVirtualOrPhysicalPath(), e)).ToList();
+            var inner = new VirtualInterFileProvider(provider, new VirtualProviderConfig
+            {
+                FileSettings = config.FileSettings,
+                Prefix = "",
+                FileInfos = fileInfoTuples
+            });
             this.AddProvider(inner);
         }
 
@@ -88,7 +94,12 @@ namespace NCloud.FileProviders.Virtual
             if (!string.IsNullOrEmpty(setting.Content))
             {
                 var memInfo = new InMemoryFileInfo(path, setting.Content, setting.Name, false);
-                return new EmbeddedFileInfo(memInfo, path);
+                var config = JsonConvert.DeserializeObject<BaseProviderConfig>(setting.Content, converter);
+                if (config == null)
+                {
+                    return memInfo;
+                }
+                return new EmbeddedFileInfo(memInfo, config, path);
             }
             if (setting.HasChildren)
             {

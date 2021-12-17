@@ -35,7 +35,7 @@ namespace NCloud.App.Extentions
         /// </summary>
         /// <typeparam name="TResult">.</typeparam>
         /// <param name="context">The context<see cref="HttpContext"/>.</param>
-        /// <param name="result">The result<see cref="TResult"/>.</param>
+        /// <param name="result">The result.</param>
         /// <returns>The <see cref="Task"/>.</returns>
         public static Task WriteResultAsync<TResult>(this HttpContext context, TResult result)
             where TResult : IActionResult

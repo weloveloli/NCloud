@@ -662,7 +662,7 @@ namespace NCloud.Utils
             }
             if (relative)
             {
-                path = Path.Combine(Directory.GetCurrentDirectory(), path);
+                path = Path.Combine(System.Environment.CurrentDirectory, path);
             }
             return path;
         }

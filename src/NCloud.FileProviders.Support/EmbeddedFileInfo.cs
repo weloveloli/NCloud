@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="EmbeddableFileInfo.cs" company="Weloveloli">
+// <copyright file="EmbeddedFileInfo.cs" company="Weloveloli">
 //    Copyright (c) 2021 weloveloli. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -7,12 +7,18 @@
 namespace NCloud.FileProviders.Support
 {
     using Microsoft.Extensions.FileProviders;
+    using NCloud.FileProviders.Abstractions;
 
     /// <summary>
     /// Defines the <see cref="EmbeddedFileInfo" />.
     /// </summary>
     public class EmbeddedFileInfo : FileInfoDecorator
     {
+        /// <summary>
+        /// Defines the config.
+        /// </summary>
+        private readonly BaseProviderConfig config;
+
         /// <summary>
         /// Defines the prefix.
         /// </summary>
@@ -22,9 +28,11 @@ namespace NCloud.FileProviders.Support
         /// Initializes a new instance of the <see cref="EmbeddedFileInfo"/> class.
         /// </summary>
         /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
+        /// <param name="config">.</param>
         /// <param name="prefix">The prefix<see cref="string"/>.</param>
-        public EmbeddedFileInfo(IFileInfo fileInfo, string prefix) : base(fileInfo)
+        public EmbeddedFileInfo(IFileInfo fileInfo, BaseProviderConfig config, string prefix) : base(fileInfo)
         {
+            this.config = config;
             this.prefix = prefix;
         }
 
@@ -42,9 +50,9 @@ namespace NCloud.FileProviders.Support
         /// The GetSetting.
         /// </summary>
         /// <returns>The <see cref="string"/>.</returns>
-        public string GetProviderConfig()
+        public BaseProviderConfig GetProviderConfig()
         {
-            return this.InnerIFileInfo.ReadAsString();
+            return config;
         }
 
         /// <summary>

@@ -20,8 +20,8 @@ namespace NCloud.FileProviders.Support
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the Protocol.
+        /// Gets or sets the Type.
         /// </summary>
-        public string Protocol { get; set; }
+        public string Type { get; set; }
     }
 }

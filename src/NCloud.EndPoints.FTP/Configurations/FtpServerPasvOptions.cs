@@ -14,7 +14,7 @@ namespace NCloud.EndPoints.FTP.Configurations
         /// <summary>
         /// Gets or sets the port range.
         /// </summary>
-        public string? Range { get; set; }
+        public string Range { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether promiscuous PASV is allowed.

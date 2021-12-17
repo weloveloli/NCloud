@@ -17,7 +17,7 @@ namespace NCloud.EndPoints.FTP.Configurations
         /// <summary>
         /// Gets or sets the FTP server address.
         /// </summary>
-        public string? Address { get; set; }
+        public string Address { get; set; }
 
         /// <summary>
         /// Gets or sets the port.

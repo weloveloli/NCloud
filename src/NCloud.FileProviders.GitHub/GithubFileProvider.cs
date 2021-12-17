@@ -15,8 +15,8 @@ namespace NCloud.FileProviders.GitHub
     /// <summary>
     /// Defines the <see cref="GithubFileProvider" />.
     /// </summary>
-    [FileProvider(Name = "github", Protocol = "github")]
-    public class GithubFileProvider : PrefixNCloudFileProvider
+    [FileProvider(Name = "github", Type = "github")]
+    public class GithubFileProvider : PrefixNCloudFileProvider<GitProviderConfig>
     {
         /// <summary>
         /// Defines the owner.
@@ -43,16 +43,10 @@ namespace NCloud.FileProviders.GitHub
         /// </summary>
         /// <param name="provider">The provider<see cref="IServiceProvider"/>.</param>
         /// <param name="config">The config<see cref="string"/>.</param>
-        /// <param name="prefix">The prefix<see cref="string"/>.</param>
-        public GithubFileProvider(IServiceProvider provider, string config, string prefix) : base(provider, config, prefix)
+        public GithubFileProvider(IServiceProvider provider, GitProviderConfig config) : base(provider, config)
         {
-            var settings = setting.Split("/");
-            if (settings.Length != 2)
-            {
-                throw new ArgumentException($"invalid config: {config}");
-            }
-            this.owner = settings[0];
-            this.project = settings[1];
+            this.owner = config.Owner;
+            this.project = config.Project;
             this.httpClient = (HttpClient)provider.GetService(typeof(HttpClient)) ?? new HttpClient();
             this.client = (GitHubClient)provider.GetService(typeof(GitHubClient)) ?? new GitHubClient(this.httpClient);
         }

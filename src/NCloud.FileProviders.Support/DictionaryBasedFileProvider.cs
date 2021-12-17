@@ -10,12 +10,15 @@ namespace NCloud.FileProviders.Support
     using System.Collections.Generic;
     using System.Linq;
     using Microsoft.Extensions.FileProviders;
+    using NCloud.FileProviders.Abstractions;
     using NCloud.Utils;
 
     /// <summary>
-    /// Defines the <see cref="DictionaryBasedFileProvider" />.
+    /// Defines the <see cref="DictionaryBasedFileProvider{DictionaryBasedProviderConfigType}" />.
     /// </summary>
-    public class DictionaryBasedFileProvider : PrefixNCloudFileProvider
+    /// <typeparam name="DictionaryBasedProviderConfigType">.</typeparam>
+    public abstract class DictionaryBasedFileProvider<DictionaryBasedProviderConfigType> : PrefixNCloudFileProvider<DictionaryBasedProviderConfigType>
+                where DictionaryBasedProviderConfigType : BaseProviderConfig, IDictionaryBasedProviderConfig, new()
     {
         /// <summary>
         /// Defines the _files.
@@ -23,14 +26,20 @@ namespace NCloud.FileProviders.Support
         protected IDictionary<string, IFileInfo> _files;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DictionaryBasedFileProvider"/> class.
+        /// Initializes a new instance of the <see cref="DictionaryBasedFileProvider{DictionaryBasedProviderConfigType}"/> class.
         /// </summary>
         /// <param name="provider">The provider<see cref="IServiceProvider"/>.</param>
         /// <param name="config">The config<see cref="string"/>.</param>
-        /// <param name="prefix">The prefix<see cref="string"/>.</param>
-        public DictionaryBasedFileProvider(IServiceProvider provider, string config, string prefix) : base(provider, config, prefix)
+        public DictionaryBasedFileProvider(IServiceProvider provider, DictionaryBasedProviderConfigType config) : base(provider, config)
         {
-            _files = new Dictionary<string, IFileInfo>();
+            if (config.GetFileInfos()?.Any() ?? false)
+            {
+                Build();
+            }
+            else
+            {
+                this._files = new Dictionary<string, IFileInfo>();
+            }
         }
 
         /// <summary>
@@ -39,12 +48,11 @@ namespace NCloud.FileProviders.Support
         protected virtual IDictionary<string, IFileInfo> Files => _files;
 
         /// <summary>
-        /// The Rebuild.
+        /// The Build.
         /// </summary>
-        /// <param name="fileInfos">The fileInfos<see cref="IEnumerable{(string, IFileInfo)}"/>.</param>
-        public void Rebuild(IEnumerable<(string key, IFileInfo info)> fileInfos)
+        public void Build()
         {
-            var items = fileInfos.Distinct(new LambdaEqual<(string key, IFileInfo info)>((e) => e.key));
+            var items = config.GetFileInfos().Distinct(new LambdaEqual<(string key, IFileInfo info)>((e) => e.key));
             _files = items.ToDictionary(t => t.key, t => t.info);
         }
 

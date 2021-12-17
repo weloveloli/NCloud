@@ -39,7 +39,7 @@ namespace NCloud.FileProviders.Physical.Tests
         [TestMethod()]
         public void PhysicalNCloudFileProviderTest()
         {
-            var fileProvider = new PhysicalNCloudFileProvider(provider, "fs:./example", "/test1");
+            var fileProvider = new PhysicalNCloudFileProvider(provider, new PhysicalProviderConfig { Path = "./example", Prefix = "/test1" });
             var contents = fileProvider.GetDirectoryContents("/");
             Assert.AreNotEqual(NotFoundDirectoryContents.Singleton, contents);
             Assert.AreEqual(1, contents.Count());

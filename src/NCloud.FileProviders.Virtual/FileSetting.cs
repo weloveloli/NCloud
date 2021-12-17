@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="VirtualFileProvider.cs" company="Weloveloli">
+// <copyright file="FileSetting.cs" company="Weloveloli">
 //    Copyright (c) 2021 weloveloli. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -12,7 +12,7 @@ namespace NCloud.FileProviders.Virtual
     /// <summary>
     /// Defines the <see cref="FileSetting" />.
     /// </summary>
-    internal class FileSetting
+    public class FileSetting
     {
         /// <summary>
         /// Gets or sets the Name.

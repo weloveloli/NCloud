@@ -17,14 +17,14 @@ namespace NCloud.FileProviders.Abstractions
         /// <summary>
         /// The AddProvider.
         /// </summary>
-        /// <param name="providers">The providers<see cref="BaseNCloudFileProvider[]"/>.</param>
+        /// <param name="providers">The providers.</param>
         /// <returns>The <see cref="bool"/>.</returns>
-        bool AddProvider(params BaseNCloudFileProvider[] providers);
+        bool AddProvider(params INCloudFileProvider[] providers);
 
         /// <summary>
         /// The RemoveProvider.
         /// </summary>
-        /// <param name="config">The config<see cref="IEnumerable{string}"/>.</param>
+        /// <param name="config">The config<see cref="IEnumerable{String}"/>.</param>
         void RemoveProvider(IEnumerable<string> config);
     }
 }
