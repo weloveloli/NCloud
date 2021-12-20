@@ -8,6 +8,8 @@ namespace NCloud.EndPoints.WebDAV.Extensions
 {
     using Microsoft.Extensions.DependencyInjection;
     using NCloud.EndPoints.WebDAV.Configurations;
+    using NWebDav.Server;
+    using NWebDav.Server.Stores;
 
     /// <summary>
     /// Defines the <see cref="ServiceCollectionExtensions" />.
@@ -24,6 +26,8 @@ namespace NCloud.EndPoints.WebDAV.Extensions
             this IServiceCollection services, WebDAVConfig webDAVConfig)
         {
             services.AddSingleton(webDAVConfig);
+            services.AddSingleton<IStore, NCloudStore>();
+            services.AddSingleton<IWebDavDispatcher, NCloudWebDAVDispatcher>();
             return services;
         }
     }

@@ -6,7 +6,9 @@
 
 namespace NCloud.FileProviders.Support
 {
+    using System;
     using System.IO;
+    using System.Security.Cryptography;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -186,12 +188,12 @@ namespace NCloud.FileProviders.Support
             }
             return null;
         }
+
         /// <summary>
         /// The CreateReadStream.
         /// </summary>
         /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
         /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
-        /// <param name="endPosition">The endPosition<see cref="long?"/>.</param>
         /// <returns>The <see cref="Stream"/>.</returns>
         public static Task<Stream> CreateReadStreamAsync(this IFileInfo fileInfo, long startPosition)
         {
@@ -204,6 +206,7 @@ namespace NCloud.FileProviders.Support
         /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
         /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
         /// <param name="endPosition">The endPosition<see cref="long?"/>.</param>
+        /// <param name="token">The token<see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="Stream"/>.</returns>
         public static Task<Stream> CreateReadStreamAsync(this IFileInfo fileInfo, long startPosition, long? endPosition, CancellationToken token)
         {
@@ -218,6 +221,28 @@ namespace NCloud.FileProviders.Support
                 return CreateReadStreamAsync(decorator.InnerIFileInfo, startPosition, endPosition, token);
             }
             return null;
+        }
+
+        /// <summary>
+        /// The DetermineContentType.
+        /// </summary>
+        /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
+        /// <returns>The <see cref="string"/>.</returns>
+        public static string DetermineContentType(this IFileInfo fileInfo)
+        {
+            return MimeTypeHelper.GetMimeType(fileInfo.Name);
+        }
+
+        /// <summary>
+        /// The CalculateEtag.
+        /// </summary>
+        /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
+        /// <returns>The <see cref="string"/>.</returns>
+        public static string CalculateEtag(this IFileInfo fileInfo)
+        {
+            using var stream = fileInfo.CreateReadStream();
+            var hash = SHA256.Create().ComputeHash(stream);
+            return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
     }
 }

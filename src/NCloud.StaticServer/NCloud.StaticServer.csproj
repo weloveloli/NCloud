@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NCloud.EndPoints.FTP\NCloud.EndPoints.FTP.csproj" />
     <ProjectReference Include="..\NCloud.EndPoints.Static\NCloud.EndPoints.Static.csproj" />
+    <ProjectReference Include="..\NCloud.EndPoints.WebDAV\NCloud.EndPoints.WebDAV.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -37,7 +38,7 @@
     <TypeScriptSourceRoot />
   </PropertyGroup>
   <ItemGroup>
-    <AssetsSourceFiles Include="../../example/**"/>
+    <AssetsSourceFiles Include="../../example/**" />
   </ItemGroup>
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
     <Copy SourceFiles="@(AssetsSourceFiles)" DestinationFolder="$(OutDir)/example" SkipUnchangedFiles="true" />

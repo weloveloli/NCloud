@@ -15,6 +15,8 @@ namespace NCloud.StaticServer
     using Microsoft.Extensions.Hosting;
     using NCloud.EndPoints.FTP;
     using NCloud.EndPoints.Static;
+    using NCloud.EndPoints.WebDAV;
+    using NCloud.EndPoints.WebDAV.Extensions;
     using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.GitHub;
     using NCloud.FileProviders.Support;
@@ -50,13 +52,17 @@ namespace NCloud.StaticServer
             services.AddHttpClient();
             services.AddSingleton<GitHubClient>();
             services.AddSingleton<INCloudFileProviderRegistry, DefaultNCloudFileProviderRegistry>();
+            services.AddSingleton<INCloudFileProvider>(s => s.GetService<INCloudFileProviderRegistry>());
             services.AddSingleton<INCloudFileProviderFactory, DefaultNCloudFileProviderFactory>();
             services.AddSingleton<IContentTypeProvider, MimeContentTypeProvider>();
             services.AddDirectoryBrowser();
-            services.AddControllersWithViews();
             if (ncloud.FtpEnable)
             {
                 services.AddNCloudFtpServer<INCloudFileProviderRegistry>(ncloud.Ftp).AddHostedService<NCloudHostedFtpService>();
+            }
+            if (ncloud.WebDAVEnable)
+            {
+                services.AddNCloudWebDAVServer(ncloud.WebDAVConfig).AddHostedService<NCloudHostedWebDAVServer>();
             }
         }
 
@@ -104,14 +110,6 @@ namespace NCloud.StaticServer
                 RequestPath = ""
             });
 
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapDefaultControllerRoute();
-            });
         }
     }
 }

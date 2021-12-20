@@ -7,6 +7,7 @@
 namespace NCloud.StaticServer.Configuration
 {
     using NCloud.EndPoints.FTP.Configurations;
+    using NCloud.EndPoints.WebDAV.Configurations;
 
     /// <summary>
     /// Defines the <see cref="NCloudStaticServerOptions" />.
@@ -19,8 +20,18 @@ namespace NCloud.StaticServer.Configuration
         public FtpOptions Ftp { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the ftp endpoint is Enable.
+        /// Gets or sets a value indicating whether the ftp endpoint is Enable...
         /// </summary>
         public bool FtpEnable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the WebDAVConfig.
+        /// </summary>
+        public WebDAVConfig WebDAVConfig { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether WebDAVEnable.
+        /// </summary>
+        public bool WebDAVEnable { get; set; }
     }
 }

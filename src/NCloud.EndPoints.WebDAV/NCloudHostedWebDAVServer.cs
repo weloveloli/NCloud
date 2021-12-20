@@ -6,7 +6,6 @@
 
 namespace NCloud.EndPoints.WebDAV
 {
-    using System;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -42,11 +41,22 @@ namespace NCloud.EndPoints.WebDAV
         /// </summary>
         private readonly WebDAVConfig webDAVConfig;
 
+        /// <summary>
+        /// Defines the logger.
+        /// </summary>
+        private readonly ILogger<NCloudHostedWebDAVServer> logger;
+
+        /// <summary>
+        /// Keep the task in a static variable to keep it alive.
+        /// </summary>
+        private static Task _mainLoop;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NCloudHostedWebDAVServer"/> class.
         /// </summary>
         /// <param name="webDavDispatcher">The webDavDispatcher<see cref="WebDavDispatcher"/>.</param>
+        /// <param name="webDAVConfig">The webDAVConfig<see cref="WebDAVConfig"/>.</param>
+        /// <param name="logger">The logger<see cref="ILogger{NCloudHostedWebDAVServer}"/>.</param>
         public NCloudHostedWebDAVServer(IWebDavDispatcher webDavDispatcher, WebDAVConfig webDAVConfig, ILogger<NCloudHostedWebDAVServer> logger)
         {
 
@@ -57,7 +67,9 @@ namespace NCloud.EndPoints.WebDAV
             {
                 // Check if HTTPS is enabled
                 if (webDAVConfig.Protocol != "https")
+                {
                     logger.LogWarning("Most WebDAV clients cannot use authentication on a non-HTTPS connection");
+                }
 
                 // Set the authentication scheme and realm
                 httpListener.AuthenticationSchemes = AuthenticationSchemes.Basic;
@@ -71,6 +83,7 @@ namespace NCloud.EndPoints.WebDAV
 
             this.webDavDispatcher = webDavDispatcher;
             this.webDAVConfig = webDAVConfig;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -78,13 +91,24 @@ namespace NCloud.EndPoints.WebDAV
         /// </summary>
         /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="Task"/>.</returns>
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            var cancellationTokenSource = new CancellationTokenSource();
+            if (_mainLoop != null && !_mainLoop.IsCompleted) return Task.CompletedTask; //Already started
+            _mainLoop = MainLoop();
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// The MainLoop.
+        /// </summary>
+        /// <returns>The <see cref="Task"/>.</returns>
+        private async Task MainLoop()
+        {
+            this.cancellationTokenSource = new CancellationTokenSource();
             var token = cancellationTokenSource.Token;
             // Start the HTTP listener
             httpListener.Start();
-
+            logger.LogWarning($"Start Webdev server {webDAVConfig.Protocol}://{webDAVConfig.Ip}:{webDAVConfig.Port}/");
             // Determine the WebDAV username/password for authorization
             // (only when basic authentication is enabled)
             var webdavUsername = webDAVConfig.UserName ?? "test";
@@ -96,9 +120,13 @@ namespace NCloud.EndPoints.WebDAV
                 // Determine the proper HTTP context
                 IHttpContext httpContext;
                 if (httpListenerContext.Request.IsAuthenticated)
+                {
                     httpContext = new HttpBasicContext(httpListenerContext, checkIdentity: i => i.Name == webdavUsername && i.Password == webdavPassword);
+                }
                 else
+                {
                     httpContext = new HttpContext(httpListenerContext);
+                }
 
                 // Dispatch the request
                 await webDavDispatcher.DispatchRequestAsync(httpContext).ConfigureAwait(false);
@@ -112,10 +140,15 @@ namespace NCloud.EndPoints.WebDAV
         /// <returns>The <see cref="Task"/>.</returns>
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            cancellationTokenSource.Cancel();
-            return Task.CompletedTask;
+            lock (httpListener)
+            {
+                //Use a lock so we don't kill a request that's currently being processed
+                httpListener.Stop();
+                this.cancellationTokenSource.Cancel();
+            }
+
+            return _mainLoop;
+
         }
-
-
     }
 }

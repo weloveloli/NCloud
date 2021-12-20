@@ -7,12 +7,11 @@
 namespace NCloud.FileProviders.Abstractions
 {
     using System.Collections.Generic;
-    using Microsoft.Extensions.FileProviders;
 
     /// <summary>
     /// Defines the <see cref="INCloudFileProviderRegistry" />.
     /// </summary>
-    public interface INCloudFileProviderRegistry : IFileProvider
+    public interface INCloudFileProviderRegistry : INCloudFileProvider
     {
         /// <summary>
         /// The AddProvider.
