@@ -30,6 +30,11 @@ namespace NCloud.FileProviders.Support
         protected CompositeFileProvider _compositeFileProvider;
 
         /// <summary>
+        /// Gets the Key.
+        /// </summary>
+        public string Key => "DefaultNCloudFileProviderRegistry";
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DefaultNCloudFileProviderRegistry"/> class.
         /// </summary>
         public DefaultNCloudFileProviderRegistry()
