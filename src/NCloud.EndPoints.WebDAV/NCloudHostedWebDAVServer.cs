@@ -6,6 +6,7 @@
 
 namespace NCloud.EndPoints.WebDAV
 {
+    using System;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -66,7 +67,7 @@ namespace NCloud.EndPoints.WebDAV
             if (webDAVConfig.Authentication)
             {
                 // Check if HTTPS is enabled
-                if (webDAVConfig.Protocol != "https")
+                if (webDAVConfig.Protocol != "http")
                 {
                     logger.LogWarning("Most WebDAV clients cannot use authentication on a non-HTTPS connection");
                 }
@@ -107,7 +108,15 @@ namespace NCloud.EndPoints.WebDAV
             this.cancellationTokenSource = new CancellationTokenSource();
             var token = cancellationTokenSource.Token;
             // Start the HTTP listener
-            httpListener.Start();
+            try
+            {
+                httpListener.Start();
+            }
+            catch(Exception e)
+            {
+                logger.LogError($"Start Webdev server{webDAVConfig.Protocol}://{webDAVConfig.Ip}:{webDAVConfig.Port}/  Failed",e);
+            }
+
             logger.LogWarning($"Start Webdev server {webDAVConfig.Protocol}://{webDAVConfig.Ip}:{webDAVConfig.Port}/");
             // Determine the WebDAV username/password for authorization
             // (only when basic authentication is enabled)
