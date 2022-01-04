@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="IRemoteFileInfo.cs" company="Weloveloli">
+// <copyright file="HttpRemoteFileInfo.cs" company="Weloveloli">
 //    Copyright (c) 2021 weloveloli. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -15,12 +15,13 @@ namespace NCloud.FileProviders.Support
     using System.Threading.Tasks;
     using Microsoft.Extensions.FileProviders;
     using NCloud.FileProviders.Abstractions;
+    using NCloud.FileProviders.Support.Streams;
     using NCloud.Utils;
 
     /// <summary>
     /// Defines the <see cref="IRemoteFileInfo" />.
     /// </summary>
-    public class HttpRemoteFileInfo : FileInfoDecorator, IRemoteFileInfo, IRandomAccessFileInfo
+    public class HttpRemoteFileInfo : FileInfoDecorator, IRemoteFileInfo, IRandomAccessFileInfo, IAsyncReadFileInfo
     {
         /// <summary>
         /// Defines the contentLength.
@@ -77,7 +78,15 @@ namespace NCloud.FileProviders.Support
             var stream = this.InnerIFileInfo.CreateReadStream();
             if (stream == null && client != null)
             {
-                stream = client.GetStreamAsync(RemoteUrl).Result;
+                if (supportRange)
+                {
+                    stream = new HttpStream(new Uri(RemoteUrl));
+                }
+                else
+                {
+                    stream = client.GetStreamAsync(RemoteUrl).Result;
+                }
+
             }
             return stream;
         }
@@ -141,6 +150,16 @@ namespace NCloud.FileProviders.Support
             var res = await client.SendAsync(request, token);
             res.EnsureSuccessStatusCode();
             return await res.Content.ReadAsStreamAsync(token);
+        }
+
+        /// <summary>
+        /// The CreateReadStreamAsync.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="Task{Stream}"/>.</returns>
+        public async Task<Stream> CreateReadStreamAsync(CancellationToken cancellationToken = default)
+        {
+            return await HttpStream.CreateAsync(new Uri(RemoteUrl), cancellationToken);
         }
     }
 }

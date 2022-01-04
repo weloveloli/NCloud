@@ -6,8 +6,6 @@
 
 namespace NCloud.FileProviders.GitHub
 {
-    using Microsoft.Extensions.FileProviders;
-    using NCloud.FileProviders.Abstractions;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -51,6 +49,5 @@ namespace NCloud.FileProviders.GitHub
         /// </summary>
         [JsonProperty(PropertyName = "download_url")]
         public string DownloadUrl { get; set; }
-
     }
 }

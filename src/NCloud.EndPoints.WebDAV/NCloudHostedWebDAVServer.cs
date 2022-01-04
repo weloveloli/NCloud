@@ -114,7 +114,7 @@ namespace NCloud.EndPoints.WebDAV
             }
             catch(Exception e)
             {
-                logger.LogError($"Start Webdev server{webDAVConfig.Protocol}://{webDAVConfig.Ip}:{webDAVConfig.Port}/  Failed",e);
+                logger.LogError(e, $"Start Webdev server{webDAVConfig.Protocol}://{webDAVConfig.Ip}:{webDAVConfig.Port}/  Failed");
             }
 
             logger.LogWarning($"Start Webdev server {webDAVConfig.Protocol}://{webDAVConfig.Ip}:{webDAVConfig.Port}/");
