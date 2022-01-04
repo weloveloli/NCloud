@@ -19,7 +19,7 @@ namespace NCloud.EndPoints.WebDAV.Configurations
         /// <summary>
         /// Gets or sets the Ip.
         /// </summary>
-        public string Ip { get; set; } = "127.0.0.1";
+        public string Ip { get; set; } = "*";
 
         /// <summary>
         /// Gets or sets the Port.

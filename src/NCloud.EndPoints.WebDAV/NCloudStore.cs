@@ -74,11 +74,11 @@ namespace NCloud.EndPoints.WebDAV
             // Determine the path from the uri
             var path = GetPathFromUri(uri);
             var fileInfo = this.iNCloudFileProvider.GetFileInfo(path);
-            if (!fileInfo.Exists && !fileInfo.IsDirectory)
+            if (fileInfo.Exists && !fileInfo.IsDirectory)
             {
                 return Task.FromResult<IStoreItem>(new NCloudItemStoreItem(fileInfo,this.LockingManager));
             }
-            else if(!fileInfo.Exists && fileInfo.IsDirectory)
+            else if(fileInfo.Exists && fileInfo.IsDirectory)
             {
                 var content = iNCloudFileProvider.GetDirectoryContents(path);
                 return Task.FromResult<IStoreItem>(new NCloudStoreCollection(LockingManager, path, content, fileInfo.Name, this.iNCloudFileProvider));
