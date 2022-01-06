@@ -7,7 +7,6 @@
 namespace NCloud.EndPoints.WebDAV
 {
     using System;
-    using System.IO;
     using System.Threading.Tasks;
     using NCloud.EndPoints.WebDAV.Models;
     using NCloud.FileProviders.Abstractions;
@@ -76,9 +75,9 @@ namespace NCloud.EndPoints.WebDAV
             var fileInfo = this.iNCloudFileProvider.GetFileInfo(path);
             if (fileInfo.Exists && !fileInfo.IsDirectory)
             {
-                return Task.FromResult<IStoreItem>(new NCloudItemStoreItem(fileInfo,this.LockingManager));
+                return Task.FromResult<IStoreItem>(new NCloudItemStoreItem(fileInfo, this.LockingManager));
             }
-            else if(fileInfo.Exists && fileInfo.IsDirectory)
+            else if (fileInfo.Exists && fileInfo.IsDirectory)
             {
                 var content = iNCloudFileProvider.GetDirectoryContents(path);
                 return Task.FromResult<IStoreItem>(new NCloudStoreCollection(LockingManager, path, content, fileInfo.Name, this.iNCloudFileProvider));

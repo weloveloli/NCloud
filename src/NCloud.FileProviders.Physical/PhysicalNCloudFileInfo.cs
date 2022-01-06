@@ -6,7 +6,10 @@
 
 namespace NCloud.FileProviders.Physical
 {
+    using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Security.Cryptography;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.FileProviders;
@@ -17,14 +20,40 @@ namespace NCloud.FileProviders.Physical
     /// <summary>
     /// Defines the <see cref="PhysicalNCloudFileInfo" />.
     /// </summary>
-    public class PhysicalNCloudFileInfo : FileInfoDecorator, IRandomAccessFileInfo
+    public class PhysicalNCloudFileInfo : FileInfoDecorator, IExtendedFileInfo
     {
+        /// <summary>
+        /// Defines the Etags.
+        /// </summary>
+        private static IDictionary<string, string> Etags = new Dictionary<string, string>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PhysicalNCloudFileInfo"/> class.
         /// </summary>
         /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
         public PhysicalNCloudFileInfo(IFileInfo fileInfo) : base(fileInfo)
         {
+        }
+
+        /// <summary>
+        /// Gets the ETag.
+        /// </summary>
+        public string ETag {
+            get {
+                var key = fileInfo.PhysicalPath;
+                if (Etags.ContainsKey(key))
+                {
+                    return Etags.GetOrDefault(key);
+                }
+                else
+                {
+                    using var stream = fileInfo.CreateReadStream();
+                    var hash = SHA256.Create().ComputeHash(stream);
+                    var tag = BitConverter.ToString(hash).Replace("-", string.Empty);
+                    Etags[key] = tag;
+                    return tag;
+                }
+            }
         }
 
         /// <summary>
@@ -54,6 +83,16 @@ namespace NCloud.FileProviders.Physical
         public Task<Stream> CreateReadStreamAsync(long startPosition, long? endPosition, CancellationToken token)
         {
             return Task.FromResult(this.CreateReadStream(startPosition, endPosition));
+        }
+
+        /// <summary>
+        /// The CreateReadStreamAsync.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="Task{Stream}"/>.</returns>
+        public Task<Stream> CreateReadStreamAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(fileInfo.CreateReadStream());
         }
     }
 }

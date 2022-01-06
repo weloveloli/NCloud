@@ -82,7 +82,7 @@ namespace NCloud.FileProviders.Support
             {
                 return ReadAsString(decorator.InnerIFileInfo);
             }
-            await using var stream = fileInfo.CreateReadStream();
+            using var stream = await fileInfo.CreateReadStreamAsync();
             using var streamReader = new StreamReader(stream, encoding, true);
             return await streamReader.ReadToEndAsync();
         }
@@ -178,7 +178,7 @@ namespace NCloud.FileProviders.Support
         {
             Check.NotNull(fileInfo, nameof(fileInfo));
 
-            if (fileInfo is IRandomAccessFileInfo randomAccessFileInfo)
+            if (fileInfo is IExtendedFileInfo randomAccessFileInfo)
             {
                 return randomAccessFileInfo.CreateReadStream(startPosition, endPosition);
             }
@@ -193,10 +193,34 @@ namespace NCloud.FileProviders.Support
         /// The CreateReadStream.
         /// </summary>
         /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
+        /// <returns>The <see cref="Stream"/>.</returns>
+        public static Task<Stream> CreateReadStreamAsync(this IFileInfo fileInfo)
+        {
+            Check.NotNull(fileInfo, nameof(fileInfo));
+
+            if (fileInfo is IAsyncReadFileInfo asyncReadFileInfo)
+            {
+                return asyncReadFileInfo.CreateReadStreamAsync();
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return CreateReadStreamAsync(decorator.InnerIFileInfo);
+            }
+            return Task.FromResult(fileInfo.CreateReadStream());
+        }
+
+        /// <summary>
+        /// The CreateReadStream.
+        /// </summary>
+        /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
         /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
         /// <returns>The <see cref="Stream"/>.</returns>
         public static Task<Stream> CreateReadStreamAsync(this IFileInfo fileInfo, long startPosition)
         {
+            if (startPosition == 0)
+            {
+                return fileInfo.CreateReadStreamAsync();
+            }
             return CreateReadStreamAsync(fileInfo, startPosition, null, CancellationToken.None);
         }
 
@@ -240,6 +264,16 @@ namespace NCloud.FileProviders.Support
         /// <returns>The <see cref="string"/>.</returns>
         public static string CalculateEtag(this IFileInfo fileInfo)
         {
+            Check.NotNull(fileInfo, nameof(fileInfo));
+
+            if (fileInfo is IExtendedFileInfo extendedFileInfo)
+            {
+                return extendedFileInfo.ETag;
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return CalculateEtag(decorator);
+            }
             using var stream = fileInfo.CreateReadStream();
             var hash = SHA256.Create().ComputeHash(stream);
             return BitConverter.ToString(hash).Replace("-", string.Empty);

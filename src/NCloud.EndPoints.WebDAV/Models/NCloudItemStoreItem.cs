@@ -77,7 +77,7 @@ namespace NCloud.EndPoints.WebDAV.Models
         /// <returns>The <see cref="Task{Stream}"/>.</returns>
         public Task<Stream> GetReadableStreamAsync(IHttpContext httpContext)
         {
-            return this.fileInfo.CreateReadStreamAsync(0);
+            return this.fileInfo.CreateReadStreamAsync();
         }
 
         /// <summary>

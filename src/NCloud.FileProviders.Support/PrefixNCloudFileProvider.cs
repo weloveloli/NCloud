@@ -64,9 +64,9 @@ namespace NCloud.FileProviders.Support
         /// <summary>
         /// The GetDirectoryContentsBySubPath.
         /// </summary>
-        /// <param name="relpath">The relpath<see cref="string"/>.</param>
+        /// <param name="relPath">The relpath<see cref="string"/>.</param>
         /// <returns>The <see cref="IDirectoryContents"/>.</returns>
-        protected abstract IDirectoryContents GetDirectoryContentsByRelPath(string relpath);
+        protected abstract IDirectoryContents GetDirectoryContentsByRelPath(string relPath);
 
         /// <summary>
         /// The GetFileInfo.

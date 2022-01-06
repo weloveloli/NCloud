@@ -12,7 +12,7 @@ namespace NCloud.FileProviders.Abstractions
     using Microsoft.Extensions.FileProviders;
 
     /// <summary>
-    /// Defines the <see cref="IRandomAccessFileInfo" />.
+    /// Defines the <see cref="IExtendedFileInfo" />.
     /// </summary>
     public interface IRandomAccessFileInfo : IFileInfo
     {
@@ -30,6 +30,6 @@ namespace NCloud.FileProviders.Abstractions
         /// <param name="startPosition">The startPosition<see cref="long"/>.</param>
         /// <param name="endPosition">The endPosition<see cref="long?"/>.</param>
         /// <returns>The <see cref="Stream"/>.</returns>
-        public Task<Stream> CreateReadStreamAsync(long startPosition, long? endPosition, CancellationToken token);
+        public Task<Stream> CreateReadStreamAsync(long startPosition, long? endPosition = null , CancellationToken token = default);
     }
 }

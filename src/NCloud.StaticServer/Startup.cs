@@ -92,7 +92,10 @@ namespace NCloud.StaticServer
             var stores = JsonConvert.DeserializeObject<List<BaseProviderConfig>>(JsonConvert.SerializeObject(storeConfig), new ProviderConfigConverter());
             foreach (var store in stores)
             {
-                dynamicFileProvider.AddProvider(fileProvider.CreateProvider(store));
+                if(store != null)
+                {
+                    dynamicFileProvider.AddProvider(fileProvider.CreateProvider(store));
+                }
             }
 
             app.UseStaticFiles(new StaticFileOptions

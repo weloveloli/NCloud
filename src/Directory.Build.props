@@ -4,7 +4,8 @@
 		<Company>weloveloli.</Company>
 		<Product>NCloud</Product>
 		<Copyright>Copyright (c) $([System.DateTime]::Now.Year) NCloud.</Copyright>
-    <Version>1.$([System.DateTime]::Now.ToString(yyyy.MMdd.HHmm))</Version>
+    <Version Condition=" '$(ASM_VER)' == '' ">0.$([System.DateTime]::Now.ToString(yyyy.MMdd.00HH))</Version>
+    <Version Condition=" '$(ASM_VER)' != '' ">$(ASM_VER)</Version>
 		<RepositoryUrl>https://github.com/weloveloli/NCloud</RepositoryUrl>
 		<RepositoryType>Git</RepositoryType>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>

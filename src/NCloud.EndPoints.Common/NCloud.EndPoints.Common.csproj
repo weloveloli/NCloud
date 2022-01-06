@@ -9,6 +9,7 @@
     <ProjectReference Include="..\NCloud.FileProviders.GitHub\NCloud.FileProviders.GitHub.csproj" />
     <ProjectReference Include="..\NCloud.FileProviders.Physical\NCloud.FileProviders.Physical.csproj" />
     <ProjectReference Include="..\NCloud.FileProviders.Virtual\NCloud.FileProviders.Virtual.csproj" />
+    <ProjectReference Include="..\NCloud.FileProviders.WebDAV\NCloud.FileProviders.WebDAV.csproj" />
     <ProjectReference Include="..\NCloud.Utils\NCloud.Utils.csproj" />
   </ItemGroup>
 
