@@ -157,7 +157,7 @@ namespace NCloud.FileProviders.Support.Streams
             var length = GetStreamLengthOrDefault(long.MaxValue);
             if (length == long.MaxValue)
             {
-                await WrapTask(readAsync(0L, new byte[1], 0, 1, CancellationToken.None));
+                await WrapTask(ReadAsync(0L, new byte[1], 0, 1, CancellationToken.None));
                 length = GetStreamLengthOrDefault(long.MaxValue);
             }
             return length;
@@ -177,7 +177,7 @@ namespace NCloud.FileProviders.Support.Streams
                 if (_cached == null)
                     return false;
 
-                var pages = getNumberOfPages();
+                var pages = GetNumberOfPages();
 
                 var len = (pages + 7) / 8;
                 if (_cached.Length < len)
@@ -219,7 +219,7 @@ namespace NCloud.FileProviders.Support.Streams
                 for (var i = 0; i < _cached.Length; i++)
                     count += BITS_COUNT_TABLE[_cached[i]];
 
-                return (double)count / getNumberOfPages();
+                return (double)count / GetNumberOfPages();
             }
         }
 
@@ -242,7 +242,7 @@ namespace NCloud.FileProviders.Support.Streams
             4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8,
         };
 
-        int getNumberOfPages()
+        int GetNumberOfPages()
         {
             var size = GetStreamLengthOrDefault(long.MaxValue);
             var pagesLong = (size + _cachePageSize - 1) / _cachePageSize;
@@ -254,22 +254,25 @@ namespace NCloud.FileProviders.Support.Streams
             return (int)pagesLong;
         }
 
-        bool isPageCached(int page)
+        bool IsPageCached(int page)
         {
             if (_isFullyCached)
+            {
                 return true;
+            }
+
             if (_cached == null)
+            {
                 return false;
+            }
 
             var i = page / 8;
             var mask = 0x80 >> (page & 7);
 
-            if (i >= _cached.Length)
-                return false;
-            return (_cached[i] & mask) == mask;
+            return i >= _cached.Length ? false : (_cached[i] & mask) == mask;
         }
 
-        void setPageCached(int page)
+        void SetPageCached(int page)
         {
             var i = page / 8;
             var mask = (byte)(0x80 >> (page & 7));
@@ -304,12 +307,12 @@ namespace NCloud.FileProviders.Support.Streams
 
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
-            var bytesRead = await readAsync(Position, buffer, offset, count, cancellationToken);
+            var bytesRead = await ReadAsync(Position, buffer, offset, count, cancellationToken);
             Position += bytesRead;
             return bytesRead;
         }
 
-        async Task<int> readAsync(long position, byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        async Task<int> ReadAsync(long position, byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             if (count == 0)
                 return 0;
@@ -329,12 +332,12 @@ namespace NCloud.FileProviders.Support.Streams
                 int bytes2Read, pagesRead;
                 var pageOffset = (long)i * _cachePageSize;
 
-                if (!isPageCached(i))
+                if (!IsPageCached(i))
                 {
                     var pagesNotCached = lastPage - i + 1;
                     for (var j = i + 1; j <= lastPage; j++)
                     {
-                        if (isPageCached(j))
+                        if (IsPageCached(j))
                         {
                             pagesNotCached = j - i;
                             break;
@@ -354,7 +357,7 @@ namespace NCloud.FileProviders.Support.Streams
                     }
 
                     for (var j = 0; j < pagesNotCached; j++)
-                        setPageCached(i + j);
+                        SetPageCached(i + j);
 
                     var e = Math.Min(pageOffset + sizeLoaded, end);
                     bytes2Read = (int)(e - pos);

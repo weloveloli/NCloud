@@ -49,6 +49,10 @@ namespace NCloud.FileProviders.Support
         /// <returns>The <see cref="INCloudFileProvider"/>.</returns>
         public bool AddProvider(params INCloudFileProvider[] providers)
         {
+            if(providers==null ||providers.Length == 0)
+            {
+                return false;
+            }
             var added = false;
             foreach (var provider in providers)
             {

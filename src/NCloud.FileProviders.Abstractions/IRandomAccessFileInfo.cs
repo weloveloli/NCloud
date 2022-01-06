@@ -12,7 +12,7 @@ namespace NCloud.FileProviders.Abstractions
     using Microsoft.Extensions.FileProviders;
 
     /// <summary>
-    /// Defines the <see cref="IRandomAccessFileInfo" />.
+    /// Defines the <see cref="IExtendedFileInfo" />.
     /// </summary>
     public interface IRandomAccessFileInfo : IFileInfo
     {

@@ -17,7 +17,7 @@ namespace NCloud.FileProviders.Support
     /// <summary>
     /// Defines the <see cref="InMemoryFileInfo" />.
     /// </summary>
-    public class InMemoryFileInfo : IVirtualPathFileInfo, IInMemoryFileInfo, IRandomAccessFileInfo
+    public class InMemoryFileInfo : IVirtualPathFileInfo, IInMemoryFileInfo, IExtendedFileInfo
     {
         /// <summary>
         /// Gets a value indicating whether Exists.
@@ -58,6 +58,11 @@ namespace NCloud.FileProviders.Support
         /// Gets the DynamicPath.
         /// </summary>
         public string DynamicPath { get; }
+
+        /// <summary>
+        /// Gets the ETag.
+        /// </summary>
+        public string ETag => throw new NotImplementedException();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InMemoryFileInfo"/> class.
@@ -140,6 +145,16 @@ namespace NCloud.FileProviders.Support
         {
             Check.CheckIndex(startPosition, endPosition, this.Length);
             return Task.FromResult(this.CreateReadStream(startPosition, endPosition));
+        }
+
+        /// <summary>
+        /// The CreateReadStreamAsync.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
+        /// <returns>The <see cref="Task{Stream}"/>.</returns>
+        public Task<Stream> CreateReadStreamAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<Stream>(new MemoryStream(_fileContent, false));
         }
     }
 }
