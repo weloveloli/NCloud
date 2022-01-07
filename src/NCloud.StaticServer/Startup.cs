@@ -55,6 +55,7 @@ namespace NCloud.StaticServer
             services.AddSingleton<INCloudFileProvider>(s => s.GetService<INCloudFileProviderRegistry>());
             services.AddSingleton<INCloudFileProviderFactory, DefaultNCloudFileProviderFactory>();
             services.AddSingleton<IContentTypeProvider, MimeContentTypeProvider>();
+            services.AddSingleton<ISystemConfigProvider>(ncloud);
             services.AddDirectoryBrowser();
             if (ncloud.FtpEnable)
             {

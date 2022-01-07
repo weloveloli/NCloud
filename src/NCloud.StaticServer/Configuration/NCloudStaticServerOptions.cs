@@ -6,13 +6,16 @@
 
 namespace NCloud.StaticServer.Configuration
 {
+    using System;
+    using System.IO;
     using NCloud.EndPoints.FTP.Configurations;
     using NCloud.EndPoints.WebDAV.Configurations;
+    using NCloud.FileProviders.Abstractions;
 
     /// <summary>
     /// Defines the <see cref="NCloudStaticServerOptions" />.
     /// </summary>
-    public class NCloudStaticServerOptions
+    public class NCloudStaticServerOptions : ISystemConfigProvider
     {
         /// <summary>
         /// Gets or sets the Ftp.
@@ -20,7 +23,7 @@ namespace NCloud.StaticServer.Configuration
         public FtpOptions Ftp { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the ftp endpoint is Enable.
+        /// Gets or sets a value indicating whether the ftp endpoint is Enable......
         /// </summary>
         public bool FtpEnable { get; set; }
 
@@ -33,5 +36,57 @@ namespace NCloud.StaticServer.Configuration
         /// Gets or sets a value indicating whether WebDAVEnable.
         /// </summary>
         public bool WebDAVEnable { get; set; }
+
+        /// <summary>
+        /// Defines the _configFolder.
+        /// </summary>
+        private string _configFolder;
+
+        /// <summary>
+        /// Defines the _cacheFolder.
+        /// </summary>
+        private string _cacheFolder;
+
+        /// <summary>
+        /// Gets or sets the ConfigFolder.
+        /// </summary>
+        public string ConfigFolder {
+            get {
+                if (!string.IsNullOrEmpty(_configFolder))
+                {
+                    return _configFolder;
+                }
+                _configFolder = Path.Combine(Environment.CurrentDirectory, "config");
+                if (!Directory.Exists(_configFolder))
+                {
+                    Directory.CreateDirectory(_configFolder);
+                }
+                return _configFolder;
+            }
+            set {
+                _configFolder = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the CacheFolder.
+        /// </summary>
+        public string CacheFolder {
+            get {
+                if (!string.IsNullOrEmpty(_cacheFolder))
+                {
+                    return _cacheFolder;
+                }
+                _configFolder = Path.Combine(Environment.CurrentDirectory, "cache");
+                if (!Directory.Exists(_cacheFolder))
+                {
+                    Directory.CreateDirectory(_cacheFolder);
+                }
+                return _cacheFolder;
+            }
+            set {
+                _cacheFolder = value;
+            }
+        }
     }
 }
