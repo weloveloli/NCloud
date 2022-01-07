@@ -295,7 +295,7 @@ namespace NCloud.FileProviders.Support.Streams
 
             InspectionFinished = true;
 
-            var s = await res.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            var s = await res.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
             var size32 = (int)size;
             stream.Position = begin;

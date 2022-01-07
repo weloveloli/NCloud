@@ -1,7 +1,13 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="ILogger.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Logging
 {
+    using System;
+
     /// <summary>
     /// Interface for logging events for a specific type.
     /// </summary>
@@ -11,29 +17,15 @@ namespace NWebDav.Server.Logging
         /// Check if the specified log level is enabled.
         /// </summary>
         /// <param name="logLevel">Log level that should be checked.</param>
-        /// <returns>
-        /// Flag indicating whether the specified log-level is enabled.
-        /// </returns>
+        /// <returns>The <see cref="bool"/>.</returns>
         bool IsLogEnabled(LogLevel logLevel);
 
         /// <summary>
         /// Log a message and an optional exception with the specified log level.
         /// </summary>
-        /// <param name="logLevel">
-        /// Log level that specified the priority of the event.
-        /// </param>
-        /// <param name="messageFunc">
-        /// Function that returns the message that should be logged if the log
-        /// level is enabled.
-        /// </param>
-        /// <param name="exception">
-        /// Optional exception that is logged with the event.
-        /// </param>
-        /// <remarks>
-        /// This method uses a function for the <paramref name="messageFunc"/>
-        /// parameter that is only evaluated if the log level is enabled. This
-        /// reduces excessive string formatting for disabled log levels.
-        /// </remarks>
+        /// <param name="logLevel">The logLevel<see cref="LogLevel"/>.</param>
+        /// <param name="messageFunc">The messageFunc<see cref="Func{string}"/>.</param>
+        /// <param name="exception">The exception<see cref="Exception"/>.</param>
         void Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null);
     }
 }

@@ -1,39 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using NWebDav.Server.Helpers;
-using NWebDav.Server.Http;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="PropPatchHandler.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Handlers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using System.Xml.Linq;
+    using NWebDav.Server.Helpers;
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Implementation of the PROPPATCH method.
     /// </summary>
-    /// <remarks>
-    /// The specification of the WebDAV PROPFIND method can be found in the
-    /// <see href="http://www.webdav.org/specs/rfc2518.html#METHOD_PROPPATCH">
-    /// WebDAV specification
-    /// </see>.
-    /// </remarks>
     public class PropPatchHandler : IRequestHandler
     {
+        /// <summary>
+        /// Defines the <see cref="PropSetCollection" />.
+        /// </summary>
         private class PropSetCollection : List<PropSetCollection.PropSet>
         {
+            /// <summary>
+            /// Defines the <see cref="PropSet" />.
+            /// </summary>
             public class PropSet
             {
+                /// <summary>
+                /// Gets the Name.
+                /// </summary>
                 public XName Name { get; }
+
+                /// <summary>
+                /// Gets the Value.
+                /// </summary>
                 public object Value { get; }
+
+                /// <summary>
+                /// Gets or sets the Result.
+                /// </summary>
                 public DavStatusCode Result { get; set; }
 
+                /// <summary>
+                /// Initializes a new instance of the <see cref="PropSet"/> class.
+                /// </summary>
+                /// <param name="name">The name<see cref="XName"/>.</param>
+                /// <param name="value">The value<see cref="object"/>.</param>
                 public PropSet(XName name, object value)
                 {
                     Name = name;
                     Value = value;
                 }
 
+                /// <summary>
+                /// The GetXmlResponse.
+                /// </summary>
+                /// <returns>The <see cref="XElement"/>.</returns>
                 public XElement GetXmlResponse()
                 {
                     var statusText = $"HTTP/1.1 {(int)Result} {Result.GetStatusDescription()}";
@@ -43,8 +69,15 @@ namespace NWebDav.Server.Handlers
                 }
             }
 
+            /// <summary>
+            /// Defines the _propertySetters.
+            /// </summary>
             private readonly IList<PropSet> _propertySetters = new List<PropSet>();
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="PropSetCollection"/> class.
+            /// </summary>
+            /// <param name="xPropertyUpdate">The xPropertyUpdate<see cref="XElement"/>.</param>
             public PropSetCollection(XElement xPropertyUpdate)
             {
                 // The document should contain a 'propertyupdate' root element
@@ -84,6 +117,11 @@ namespace NWebDav.Server.Handlers
                 }
             }
 
+            /// <summary>
+            /// The GetXmlMultiStatus.
+            /// </summary>
+            /// <param name="uri">The uri<see cref="Uri"/>.</param>
+            /// <returns>The <see cref="XElement"/>.</returns>
             public XElement GetXmlMultiStatus(Uri uri)
             {
                 var xResponse = new XElement(WebDavNamespaces.DavNs + "response", new XElement(WebDavNamespaces.DavNs + "href", UriHelper.ToEncodedString(uri)));
@@ -97,16 +135,9 @@ namespace NWebDav.Server.Handlers
         /// <summary>
         /// Handle a PROPPATCH request.
         /// </summary>
-        /// <param name="httpContext">
-        /// The HTTP context of the request.
-        /// </param>
-        /// <param name="store">
-        /// Store that is used to access the collections and items.
-        /// </param>
-        /// <returns>
-        /// A task that represents the asynchronous PROPPATCH operation. The task
-        /// will always return <see langword="true"/> upon completion.
-        /// </returns>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="store">The store<see cref="IStore"/>.</param>
+        /// <returns>The <see cref="Task{bool}"/>.</returns>
         public async Task<bool> HandleRequestAsync(IHttpContext httpContext, IStore store)
         {
             // Obtain request and response

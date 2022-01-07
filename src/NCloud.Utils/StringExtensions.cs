@@ -653,7 +653,7 @@ namespace NCloud.Utils
                 relative = true;
                 path = path.Substring(2);
             }
-            if (OperatingSystem.IsWindows())
+            if (IsWindows())
             {
                 path = Regex.Replace(path, @"^\/([^\/]+?)", @"$1:\\");
                 path = Regex.Replace(path, @"\/", "\\");
@@ -674,7 +674,7 @@ namespace NCloud.Utils
         /// <returns>The <see cref="bool"/>.</returns>
         public static string ToPosixPath(this string path)
         {
-            if (OperatingSystem.IsWindows())
+            if (IsWindows())
             {
                 path = path.Split(Path.DirectorySeparatorChar).Aggregate((a, b) => a + "/" + b);
                 path = Regex.Replace(path, @"^([a-zA-Z])\:", "/$1");
@@ -719,6 +719,11 @@ namespace NCloud.Utils
                 }
             }
             return true;
+        }
+
+        public static bool IsWindows()
+        {
+            return Environment.OSVersion.Platform == PlatformID.Win32NT;
         }
     }
 }

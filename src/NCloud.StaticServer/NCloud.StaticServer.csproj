@@ -5,7 +5,6 @@
     <UserSecretsId>4917c1bd-0318-4a9a-823f-32a8136fa3d2</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
-    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.13" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
   </ItemGroup>
 
   <ItemGroup>

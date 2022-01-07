@@ -68,7 +68,7 @@ namespace NCloud.FileProviders.Support
         /// <param name="checkLength">The checkLength<see cref="bool"/>.</param>
         /// <param name="supportRange">The supportRange<see cref="bool"/>.</param>
         /// <param name="etag">The etag<see cref="string"/>.</param>
-        public HttpRemoteFileInfo(string remoteUrl, IFileInfo fileInfo, HttpClient client, bool checkLength = false, bool supportRange = true, string etag = null) : base(fileInfo)
+        public HttpRemoteFileInfo(string remoteUrl, IFileInfo fileInfo, HttpClient client, bool checkLength = false, bool supportRange = true, string? etag = null) : base(fileInfo)
         {
             this.RemoteUrl = remoteUrl;
             this.client = client;
@@ -99,7 +99,7 @@ namespace NCloud.FileProviders.Support
             {
                 if (supportRange)
                 {
-                    stream = new HttpStream(new Uri(RemoteUrl));
+                    stream =  HttpStream.CreateAsync(new Uri(RemoteUrl)).Result;
                 }
                 else
                 {
@@ -132,7 +132,7 @@ namespace NCloud.FileProviders.Support
             request.Headers.Range = new RangeHeaderValue(startPosition, endPosition);
             var res = client.SendAsync(request).Result;
             res.EnsureSuccessStatusCode();
-            return res.Content.ReadAsStream();
+            return res.Content.ReadAsStreamAsync().Result;
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace NCloud.FileProviders.Support
             request.Headers.Range = new RangeHeaderValue(startPosition, endPosition);
             var res = await client.SendAsync(request, token);
             res.EnsureSuccessStatusCode();
-            return await res.Content.ReadAsStreamAsync(token);
+            return await res.Content.ReadAsStreamAsync();
         }
 
         /// <summary>

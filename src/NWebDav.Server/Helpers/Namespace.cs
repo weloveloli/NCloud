@@ -1,4 +1,10 @@
-﻿namespace NWebDav.Server.Helpers
+﻿// -----------------------------------------------------------------------
+// <copyright file="Namespace.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NWebDav.Server.Helpers
 {
     /// <summary>
     /// This namespace defines all the helper classes to implement the NWebDAV

@@ -40,6 +40,7 @@ namespace NCloud.Utils
             stream.Position = 0;
             await stream.CopyToAsync(memoryStream, cancellationToken);
             return memoryStream.ToArray();
+
         }
 
         /// <summary>

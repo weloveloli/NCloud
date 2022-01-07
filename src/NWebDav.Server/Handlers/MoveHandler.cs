@@ -1,43 +1,35 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-using NWebDav.Server.Helpers;
-using NWebDav.Server.Http;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="MoveHandler.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Handlers
 {
+    using System;
+    using System.Threading.Tasks;
+    using System.Xml.Linq;
+    using NWebDav.Server.Helpers;
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Implementation of the MOVE method.
     /// </summary>
-    /// <remarks>
-    /// The specification of the WebDAV MOVE method can be found in the
-    /// <see href="http://www.webdav.org/specs/rfc2518.html#METHOD_MOVE">
-    /// WebDAV specification
-    /// </see>.
-    /// </remarks>
     public class MoveHandler : IRequestHandler
     {
         /// <summary>
         /// Handle a MOVE request.
         /// </summary>
-        /// <param name="httpContext">
-        /// The HTTP context of the request.
-        /// </param>
-        /// <param name="store">
-        /// Store that is used to access the collections and items.
-        /// </param>
-        /// <returns>
-        /// A task that represents the asynchronous MOVE operation. The task
-        /// will always return <see langword="true"/> upon completion.
-        /// </returns>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="store">The store<see cref="IStore"/>.</param>
+        /// <returns>The <see cref="Task{bool}"/>.</returns>
         public async Task<bool> HandleRequestAsync(IHttpContext httpContext, IStore store)
         {
             // Obtain request and response
             var request = httpContext.Request;
             var response = httpContext.Response;
-            
+
             // We should always move the item from a parent container
             var splitSourceUri = RequestHelper.SplitUri(request.Url);
 
@@ -126,6 +118,18 @@ namespace NWebDav.Server.Handlers
             return true;
         }
 
+        /// <summary>
+        /// The MoveAsync.
+        /// </summary>
+        /// <param name="sourceCollection">The sourceCollection<see cref="IStoreCollection"/>.</param>
+        /// <param name="moveItem">The moveItem<see cref="IStoreItem"/>.</param>
+        /// <param name="destinationCollection">The destinationCollection<see cref="IStoreCollection"/>.</param>
+        /// <param name="destinationName">The destinationName<see cref="string"/>.</param>
+        /// <param name="overwrite">The overwrite<see cref="bool"/>.</param>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="baseUri">The baseUri<see cref="Uri"/>.</param>
+        /// <param name="errors">The errors<see cref="UriResultCollection"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         private async Task MoveAsync(IStoreCollection sourceCollection, IStoreItem moveItem, IStoreCollection destinationCollection, string destinationName, bool overwrite, IHttpContext httpContext, Uri baseUri, UriResultCollection errors)
         {
             // Determine the new base URI

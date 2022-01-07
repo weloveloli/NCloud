@@ -52,9 +52,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NWebDav.Server", "NWebDav.S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NWebDav.Server.HttpListener", "NWebDav.Server.HttpListener\NWebDav.Server.HttpListener.csproj", "{D741E4A7-98D8-4465-8D25-A2E6406F321D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCloud.FileProviders.WebDAV", "NCloud.FileProviders.WebDAV\NCloud.FileProviders.WebDAV.csproj", "{D8A77EFD-E021-418E-8384-605348A5FABD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.FileProviders.WebDAV", "NCloud.FileProviders.WebDAV\NCloud.FileProviders.WebDAV.csproj", "{D8A77EFD-E021-418E-8384-605348A5FABD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCloud.FileProviders.WebDAVTests", "NCloud.FileProviders.WebDAVTests\NCloud.FileProviders.WebDAVTests.csproj", "{40D146E4-C353-4B65-8635-8351931AC987}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCloud.FileProviders.WebDAVTests", "NCloud.FileProviders.WebDAVTests\NCloud.FileProviders.WebDAVTests.csproj", "{40D146E4-C353-4B65-8635-8351931AC987}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
