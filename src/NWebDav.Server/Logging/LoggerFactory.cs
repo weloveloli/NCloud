@@ -1,7 +1,13 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="LoggerFactory.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Logging
 {
+    using System;
+
     /// <summary>
     /// Helper class to specify the default logger for the NWebDAV code.
     /// </summary>

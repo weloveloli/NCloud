@@ -1,7 +1,13 @@
-﻿using System.Xml.Linq;
+﻿// -----------------------------------------------------------------------
+// <copyright file="PropertyInfo.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Props
 {
+    using System.Xml.Linq;
+
     /// <summary>
     /// Information structure about a property.
     /// </summary>

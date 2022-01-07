@@ -1,7 +1,13 @@
-﻿using System.Xml.Linq;
+﻿// -----------------------------------------------------------------------
+// <copyright file="WebDavNamespaces.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server
 {
+    using System.Xml.Linq;
+
     /// <summary>
     /// Defines all the XML namespaces that are typically used in WebDAV
     /// requests and responses.

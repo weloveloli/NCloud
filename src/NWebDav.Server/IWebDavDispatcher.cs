@@ -1,9 +1,15 @@
-﻿using System.Threading.Tasks;
-
-using NWebDav.Server.Http;
+﻿// -----------------------------------------------------------------------
+// <copyright file="IWebDavDispatcher.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server
 {
+    using System.Threading.Tasks;
+
+    using NWebDav.Server.Http;
+
     /// <summary>
     /// Interface that is responsible for dispatching WebDAV requests.
     /// </summary>

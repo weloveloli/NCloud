@@ -1,9 +1,15 @@
-﻿using System.Xml.Linq;
-
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DavExtCollectionProperties.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Props
 {
+    using System.Xml.Linq;
+
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Specifies the number of contained resources.
     /// </summary>
