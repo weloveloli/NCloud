@@ -1,13 +1,19 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-using NWebDav.Server.Http;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DavProperty.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Props
 {
+    using System;
+    using System.Diagnostics;
+    using System.Threading.Tasks;
+    using System.Xml.Linq;
+
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Abstract base class representing a single DAV property.
     /// </summary>

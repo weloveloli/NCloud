@@ -1,12 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-using NWebDav.Server.Http;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="IPropertyManager.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Props
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using System.Xml.Linq;
+
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// This interface defines the property manager that is responsible to
     /// handle all the properties for store items and collections.

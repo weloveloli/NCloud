@@ -1,9 +1,15 @@
-﻿using System.Net;
-
-using NWebDav.Server.Helpers;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DavStatusCode.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server
 {
+    using System.Net;
+
+    using NWebDav.Server.Helpers;
+
     /// <summary>
     /// DAV status return codes.
     /// </summary>

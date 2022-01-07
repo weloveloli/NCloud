@@ -1,17 +1,23 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
-
-using NWebDav.Server.Helpers;
-using NWebDav.Server.Http;
-using NWebDav.Server.Locking;
-using NWebDav.Server.Logging;
-using NWebDav.Server.Props;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DiskStoreItem.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Stores
 {
+    using System;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Security.Cryptography;
+    using System.Threading.Tasks;
+
+    using NWebDav.Server.Helpers;
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Locking;
+    using NWebDav.Server.Logging;
+    using NWebDav.Server.Props;
+
     [DebuggerDisplay("{_fileInfo.FullPath}")]
     public sealed class DiskStoreItem : IDiskStoreItem
     {

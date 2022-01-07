@@ -1,15 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
-
-using NWebDav.Server.Http;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DavTypedProperties.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Props
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Threading.Tasks;
+    using System.Xml;
+    using System.Xml.Linq;
+
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Abstract base class representing a single DAV property with a specific
     /// CLR type.

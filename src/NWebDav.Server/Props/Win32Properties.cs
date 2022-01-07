@@ -1,12 +1,18 @@
-﻿using System;
-using System.IO;
-using System.Xml.Linq;
-
-using NWebDav.Server.Http;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="Win32Properties.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Props
 {
+    using System;
+    using System.IO;
+    using System.Xml.Linq;
+
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Contains the creation time of the collection or item.
     /// </summary>

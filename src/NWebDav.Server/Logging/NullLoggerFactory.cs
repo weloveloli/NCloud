@@ -1,7 +1,13 @@
-﻿using System;
+﻿// -----------------------------------------------------------------------
+// <copyright file="NullLoggerFactory.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Logging
 {
+    using System;
+
     /// <summary>
     /// Implementation of a logger factory that creates <see cref="ILogger"/>
     /// instances that don't log anything.

@@ -1,9 +1,15 @@
-﻿using System.Xml.Linq;
-
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="StandardProperties.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Props
 {
+    using System.Xml.Linq;
+
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Records the time and date the resource was created (ISO 8601 format).
     /// </summary>

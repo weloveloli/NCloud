@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
-using NWebDav.Server.Handlers;
-using NWebDav.Server.Http;
+﻿// -----------------------------------------------------------------------
+// <copyright file="RequestHandlerFactory.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server
 {
+    using System.Collections.Generic;
+    using NWebDav.Server.Handlers;
+    using NWebDav.Server.Http;
+
     /// <summary>
     /// Default implementation of the <see cref="IRequestHandlerFactory"/>
     /// interface to create WebDAV request handlers. 

@@ -1,15 +1,21 @@
-﻿using System;
-using System.Diagnostics;
-using System.Reflection;
-using System.Threading.Tasks;
-
-using NWebDav.Server.Helpers;
-using NWebDav.Server.Http;
-using NWebDav.Server.Logging;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="WebDavDispatcher.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server
 {
+    using System;
+    using System.Diagnostics;
+    using System.Reflection;
+    using System.Threading.Tasks;
+
+    using NWebDav.Server.Helpers;
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Logging;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Default implementation of the <see cref="IWebDavDispatcher"/>
     /// interface to dispatch WebDAV requests.

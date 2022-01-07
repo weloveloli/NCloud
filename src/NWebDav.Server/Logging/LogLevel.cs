@@ -1,4 +1,10 @@
-﻿namespace NWebDav.Server.Logging
+﻿// -----------------------------------------------------------------------
+// <copyright file="LogLevel.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace NWebDav.Server.Logging
 {
     /// <summary>
     /// The log level specifies the priority of the log event.

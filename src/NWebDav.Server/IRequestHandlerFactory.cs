@@ -1,7 +1,13 @@
-﻿using NWebDav.Server.Http;
+﻿// -----------------------------------------------------------------------
+// <copyright file="IRequestHandlerFactory.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server
 {
+    using NWebDav.Server.Http;
+
     /// <summary>
     /// Factory responsible for returning the proper
     /// <see cref="IRequestHandler"/> instance to handle the request.

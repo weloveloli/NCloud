@@ -1,9 +1,15 @@
-﻿using System.Linq;
-
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="DefaultLockingProperties.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Props
 {
+    using System.Linq;
+
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Default implementation to describe the active locks on a resource.
     /// </summary>
