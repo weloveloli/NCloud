@@ -1,51 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-using NWebDav.Server.Http;
+﻿// -----------------------------------------------------------------------
+// <copyright file="RequestHelper.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Helpers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
+    using System.Xml.Linq;
+    using NWebDav.Server.Http;
+
     /// <summary>
     /// Split URI consisting of a collection URI and a name string.
     /// </summary>
     public class SplitUri
     {
         /// <summary>
-        /// Collection URI that holds the collection/document.
+        /// Gets or sets the CollectionUri
+        /// Collection URI that holds the collection/document...
         /// </summary>
         public Uri CollectionUri { get; set; }
 
         /// <summary>
-        /// Name of the collection/document within its container collection.
+        /// Gets or sets the Name
+        /// Name of the collection/document within its container collection...
         /// </summary>
         public string Name { get; set; }
     }
 
     /// <summary>
-    /// Range
+    /// Range.
     /// </summary>
     public class Range
     {
         /// <summary>
-        /// Optional start value.
+        /// Gets or sets the Start
+        /// Optional start value...
         /// </summary>
         public long? Start { get; set; }
 
         /// <summary>
-        /// Optional end value.
+        /// Gets or sets the End
+        /// Optional end value...
         /// </summary>
         public long? End { get; set; }
 
         /// <summary>
-        /// Optional conditional date/time.
+        /// Gets or sets the If
+        /// Optional conditional date/time...
         /// </summary>
-        public DateTime If {get; set; }
+        public DateTime If { get; set; }
     }
 
     /// <summary>
@@ -53,18 +63,16 @@ namespace NWebDav.Server.Helpers
     /// </summary>
     public static class RequestHelper
     {
-#if DEBUG
-        private static readonly NWebDav.Server.Logging.ILogger s_log = NWebDav.Server.Logging.LoggerFactory.CreateLogger(typeof(ResponseHelper));
-#endif
+        /// <summary>
+        /// Defines the s_rangeRegex.
+        /// </summary>
         private static readonly Regex s_rangeRegex = new Regex("bytes\\=(?<start>[0-9]*)-(?<end>[0-9]*)");
 
         /// <summary>
         /// Split an URI into a collection and name part.
         /// </summary>
         /// <param name="uri">URI that should be split.</param>
-        /// <returns>
-        /// Split URI in a collection URI and a name string.
-        /// </returns>
+        /// <returns>The <see cref="SplitUri"/>.</returns>
         public static SplitUri SplitUri(Uri uri)
         {
             // Strip a trailing slash
@@ -89,10 +97,7 @@ namespace NWebDav.Server.Helpers
         /// Obtain the destination uri from the request.
         /// </summary>
         /// <param name="request">HTTP request.</param>
-        /// <returns>
-        /// Destination for this HTTP request (or <see langword="null"/> if no
-        /// destination is specified).
-        /// </returns>
+        /// <returns>The <see cref="Uri"/>.</returns>
         public static Uri GetDestinationUri(this IHttpRequest request)
         {
             // Obtain the destination
@@ -102,19 +107,13 @@ namespace NWebDav.Server.Helpers
 
             // Create the destination URI
             return destinationHeader.StartsWith("/") ? new Uri(request.Url, destinationHeader) : new Uri(destinationHeader);
-        }        
+        }
 
         /// <summary>
         /// Obtain the depth value from the request.
         /// </summary>
         /// <param name="request">HTTP request.</param>
-        /// <returns>
-        /// Depth of the HTTP request (<c>int.MaxValue</c> if infinity).
-        /// </returns>
-        /// <remarks>
-        /// If the Depth header is not set, then the specification specifies
-        /// that it should be interpreted as infinity.
-        /// </remarks>
+        /// <returns>The <see cref="int"/>.</returns>
         public static int GetDepth(this IHttpRequest request)
         {
             // Obtain the depth header (no header means infinity)
@@ -134,15 +133,7 @@ namespace NWebDav.Server.Helpers
         /// Obtain the overwrite value from the request.
         /// </summary>
         /// <param name="request">HTTP request.</param>
-        /// <returns>
-        /// Flag indicating whether or not to overwrite the destination
-        /// if it already exists.
-        /// </returns>
-        /// <remarks>
-        /// If the Overwrite header is not set, then the specification
-        /// specifies that it should be interpreted as 
-        /// <see langwordk="true"/>.
-        /// </remarks>
+        /// <returns>The <see cref="bool"/>.</returns>
         public static bool GetOverwrite(this IHttpRequest request)
         {
             // Get the Overwrite header
@@ -156,13 +147,7 @@ namespace NWebDav.Server.Helpers
         /// Obtain the list of timeout values from the request.
         /// </summary>
         /// <param name="request">HTTP request.</param>
-        /// <returns>
-        /// List of timeout values in seconds (<c>-1</c> if infinite).
-        /// </returns>
-        /// <remarks>
-        /// If the Timeout header is not set, then <see langword="null"/> is
-        /// returned.
-        /// </remarks>
+        /// <returns>The <see cref="IList{int}"/>.</returns>
         public static IList<int> GetTimeouts(this IHttpRequest request)
         {
             // Get the value of the timeout header as a string
@@ -191,9 +176,7 @@ namespace NWebDav.Server.Helpers
         /// Obtain the lock-token URI from the request.
         /// </summary>
         /// <param name="request">HTTP request.</param>
-        /// <returns>
-        /// Lock token URI (<see langword="null"/> if not set).
-        /// </returns>
+        /// <returns>The <see cref="Uri"/>.</returns>
         public static Uri GetLockToken(this IHttpRequest request)
         {
             // Get the value of the lock-token header as a string
@@ -213,9 +196,7 @@ namespace NWebDav.Server.Helpers
         /// Obtain the if-lock-token URI from the request.
         /// </summary>
         /// <param name="request">HTTP request.</param>
-        /// <returns>
-        /// If lock token URI (<see langword="null"/> if not set).
-        /// </returns>
+        /// <returns>The <see cref="Uri"/>.</returns>
         public static Uri GetIfLockToken(this IHttpRequest request)
         {
             // Get the value of the lock-token header as a string
@@ -235,9 +216,7 @@ namespace NWebDav.Server.Helpers
         /// Obtain the range value from the request.
         /// </summary>
         /// <param name="request">HTTP request.</param>
-        /// <returns>
-        /// Range value (start/end) with an option if condition.
-        /// </returns>
+        /// <returns>The <see cref="Range"/>.</returns>
         public static Range GetRange(this IHttpRequest request)
         {
             // Get the value of the range header as a string
@@ -256,7 +235,7 @@ namespace NWebDav.Server.Helpers
             var range = new Range
             {
                 Start = !string.IsNullOrEmpty(startText) ? (long?)long.Parse(startText) : null,
-                End = !string.IsNullOrEmpty(endText) ? (long?)long.Parse(endText ) : null
+                End = !string.IsNullOrEmpty(endText) ? (long?)long.Parse(endText) : null
             };
 
             // Check if we also have an If-Range
@@ -281,24 +260,8 @@ namespace NWebDav.Server.Helpers
         /// Load an XML document from the HTTP request body.
         /// </summary>
         /// <param name="request">HTTP request.</param>
-        /// <returns>
-        /// XML document that represents the body content (or 
-        /// <see langword="null"/> if no body content is specified).
-        /// </returns>
-
-        // The async version of XDocument.LoadAsync has become available with .NET Standard 2.1
-        // and is required for modern Kestrel versions that require all reads to be done async.
-        // Older versions use a synchronous version and have the additional penalty of using
-        // async, but if performance is an ultimate goal, then don't use WebDAV and you should
-        // be upgrading to .NET Core anyway :-) The other option is to put the burden on all
-        // the callers of this method, which I prefer to avoid.
-#if !USE_ASYNC_READ
-#pragma warning disable 1998
-#endif
+        /// <returns>The <see cref="Task{XDocument}"/>.</returns>
         public static async Task<XDocument> LoadXmlDocumentAsync(this IHttpRequest request)
-#if !USE_ASYNC_READ
-#pragma warning restore 1998
-#endif
         {
             // If there is no input stream, then there is no XML document
             if (request.Stream == null || request.Stream == Stream.Null)
@@ -321,36 +284,6 @@ namespace NWebDav.Server.Helpers
             var xDocument = await XDocument.LoadAsync(request.Stream, LoadOptions.None, cancellationToken: default);
 #else
             var xDocument = XDocument.Load(request.Stream);
-#endif
-#if DEBUG
-            // Dump the XML document to the logging
-            if (xDocument.Root != null && s_log.IsLogEnabled(NWebDav.Server.Logging.LogLevel.Debug))
-            {
-                // Format the XML document as an in-memory text representation
-                using (var ms = new MemoryStream())
-                {
-                    using (var xmlWriter = System.Xml.XmlWriter.Create(ms, new System.Xml.XmlWriterSettings
-                    {
-                        OmitXmlDeclaration = false,
-                        Indent = true,
-                        Encoding = System.Text.Encoding.UTF8,
-                    }))
-                    {
-                        // Write the XML document to the stream
-                        xDocument.WriteTo(xmlWriter);
-                    }
-
-                    // Flush
-                    ms.Flush();
-
-                    // Reset stream and write the stream to the result
-                    ms.Seek(0, SeekOrigin.Begin);
-
-                    // Log the XML text to the logging
-                    var reader = new StreamReader(ms);
-                    s_log.Log(NWebDav.Server.Logging.LogLevel.Debug, () => reader.ReadToEnd());
-                }
-            }
 #endif
             // Return the XML document
             return xDocument;

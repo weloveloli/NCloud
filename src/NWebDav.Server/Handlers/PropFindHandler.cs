@@ -1,33 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-using NWebDav.Server.Helpers;
-using NWebDav.Server.Http;
-using NWebDav.Server.Logging;
-using NWebDav.Server.Props;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="PropFindHandler.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Handlers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using System.Xml.Linq;
+    using NWebDav.Server.Helpers;
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Logging;
+    using NWebDav.Server.Props;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Implementation of the PROPFIND method.
     /// </summary>
-    /// <remarks>
-    /// The specification of the WebDAV PROPFIND method can be found in the
-    /// <see href="http://www.webdav.org/specs/rfc2518.html#METHOD_PROPFIND">
-    /// WebDAV specification
-    /// </see>.
-    /// </remarks>
     public class PropFindHandler : IRequestHandler
     {
+        /// <summary>
+        /// Defines the <see cref="PropertyEntry" />.
+        /// </summary>
         private struct PropertyEntry
         {
+            /// <summary>
+            /// Gets the Uri.
+            /// </summary>
             public Uri Uri { get; }
+
+            /// <summary>
+            /// Gets the Entry.
+            /// </summary>
             public IStoreItem Entry { get; }
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref=""/> class.
+            /// </summary>
+            /// <param name="uri">The uri<see cref="Uri"/>.</param>
+            /// <param name="entry">The entry<see cref="IStoreItem"/>.</param>
             public PropertyEntry(Uri uri, IStoreItem entry)
             {
                 Uri = uri;
@@ -35,30 +49,44 @@ namespace NWebDav.Server.Handlers
             }
         }
 
+        /// <summary>
+        /// Defines the PropertyMode.
+        /// </summary>
         [Flags]
         private enum PropertyMode
         {
+            /// <summary>
+            /// Defines the None.
+            /// </summary>
             None = 0,
+
+            /// <summary>
+            /// Defines the PropertyNames.
+            /// </summary>
             PropertyNames = 1,
+
+            /// <summary>
+            /// Defines the AllProperties.
+            /// </summary>
             AllProperties = 2,
+
+            /// <summary>
+            /// Defines the SelectedProperties.
+            /// </summary>
             SelectedProperties = 4
         }
 
+        /// <summary>
+        /// Defines the s_log.
+        /// </summary>
         private static readonly ILogger s_log = LoggerFactory.CreateLogger(typeof(PropFindHandler));
 
         /// <summary>
         /// Handle a PROPFIND request.
         /// </summary>
-        /// <param name="httpContext">
-        /// The HTTP context of the request.
-        /// </param>
-        /// <param name="store">
-        /// Store that is used to access the collections and items.
-        /// </param>
-        /// <returns>
-        /// A task that represents the asynchronous PROPFIND operation. The task
-        /// will always return <see langword="true"/> upon completion.
-        /// </returns>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="store">The store<see cref="IStore"/>.</param>
+        /// <returns>The <see cref="Task{bool}"/>.</returns>
         public async Task<bool> HandleRequestAsync(IHttpContext httpContext, IStore store)
         {
             // Obtain request and response
@@ -175,6 +203,17 @@ namespace NWebDav.Server.Handlers
             return true;
         }
 
+        /// <summary>
+        /// The AddPropertyAsync.
+        /// </summary>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="xResponse">The xResponse<see cref="XElement"/>.</param>
+        /// <param name="xPropStatValues">The xPropStatValues<see cref="XElement"/>.</param>
+        /// <param name="propertyManager">The propertyManager<see cref="IPropertyManager"/>.</param>
+        /// <param name="item">The item<see cref="IStoreItem"/>.</param>
+        /// <param name="propertyName">The propertyName<see cref="XName"/>.</param>
+        /// <param name="addedProperties">The addedProperties<see cref="IList{XName}"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         private async Task AddPropertyAsync(IHttpContext httpContext, XElement xResponse, XElement xPropStatValues, IPropertyManager propertyManager, IStoreItem item, XName propertyName, IList<XName> addedProperties)
         {
             if (!addedProperties.Contains(propertyName))
@@ -187,7 +226,7 @@ namespace NWebDav.Server.Handlers
                     {
                         var value = await propertyManager.GetPropertyAsync(httpContext, item, propertyName).ConfigureAwait(false);
                         if (value is IEnumerable<XElement>)
-                            value = ((IEnumerable<XElement>) value).Cast<object>().ToArray();
+                            value = ((IEnumerable<XElement>)value).Cast<object>().ToArray();
 
                         // Make sure we use the same 'prop' tag to add all properties
                         var xProp = xPropStatValues.Element(WebDavNamespaces.DavNs + "prop");
@@ -219,6 +258,12 @@ namespace NWebDav.Server.Handlers
             }
         }
 
+        /// <summary>
+        /// The GetRequestedPropertiesAsync.
+        /// </summary>
+        /// <param name="request">The request<see cref="IHttpRequest"/>.</param>
+        /// <param name="properties">The properties<see cref="ICollection{XName}"/>.</param>
+        /// <returns>The <see cref="Task{PropertyMode}"/>.</returns>
         private static async Task<PropertyMode> GetRequestedPropertiesAsync(IHttpRequest request, ICollection<XName> properties)
         {
             // Create an XML document from the stream
@@ -269,6 +314,15 @@ namespace NWebDav.Server.Handlers
             return propertyMode;
         }
 
+        /// <summary>
+        /// The AddEntriesAsync.
+        /// </summary>
+        /// <param name="collection">The collection<see cref="IStoreCollection"/>.</param>
+        /// <param name="depth">The depth<see cref="int"/>.</param>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="uri">The uri<see cref="Uri"/>.</param>
+        /// <param name="entries">The entries<see cref="IList{PropertyEntry}"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         private async Task AddEntriesAsync(IStoreCollection collection, int depth, IHttpContext httpContext, Uri uri, IList<PropertyEntry> entries)
         {
             // Add the collection to the list
@@ -290,6 +344,3 @@ namespace NWebDav.Server.Handlers
         }
     }
 }
-
-
-

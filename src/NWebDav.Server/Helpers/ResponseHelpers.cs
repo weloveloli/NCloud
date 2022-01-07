@@ -1,15 +1,20 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
-
-using NWebDav.Server.Http;
+﻿// -----------------------------------------------------------------------
+// <copyright file="ResponseHelpers.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Helpers
 {
+    using System;
+    using System.Globalization;
+    using System.IO;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Xml;
+    using System.Xml.Linq;
+    using NWebDav.Server.Http;
+
     /// <summary>
     /// Helper methods for <see cref="IHttpResponse"/> objects.
     /// </summary>
@@ -18,27 +23,18 @@ namespace NWebDav.Server.Helpers
 #if DEBUG
         private static readonly NWebDav.Server.Logging.ILogger s_log = NWebDav.Server.Logging.LoggerFactory.CreateLogger(typeof(ResponseHelper));
 #endif
-        private static readonly UTF8Encoding s_utf8Encoding = new UTF8Encoding(false);  // Suppress BOM (not compatible with WebDrive)
+        /// <summary>
+        /// Defines the s_utf8Encoding.
+        /// </summary>
+        private static readonly UTF8Encoding s_utf8Encoding = new UTF8Encoding(false);// Suppress BOM (not compatible with WebDrive)
 
         /// <summary>
         /// Set status of the HTTP response.
         /// </summary>
-        /// <param name="response">
-        /// The HTTP response that should be changed.
-        /// </param>
-        /// <param name="statusCode">
-        /// WebDAV status code that should be set.
-        /// </param>
-        /// <param name="statusDescription">
-        /// The human-readable WebDAV status description. If no status
-        /// description is set (or <see langword="null"/>), then the
-        /// default status description is written. 
-        /// </param>
-        /// <remarks>
-        /// Not all HTTP infrastructures allow to set the status description,
-        /// so it should only be used for informational purposes.
-        /// </remarks>
-        public static void SetStatus(this IHttpResponse response, DavStatusCode statusCode, string statusDescription = null)
+        /// <param name="response">The response<see cref="IHttpResponse"/>.</param>
+        /// <param name="statusCode">The statusCode<see cref="DavStatusCode"/>.</param>
+        /// <param name="statusDescription">The statusDescription<see cref="string?"/>.</param>
+        public static void SetStatus(this IHttpResponse response, DavStatusCode statusCode, string? statusDescription = null)
         {
             // Set the status code and description
             response.Status = (int)statusCode;
@@ -48,18 +44,10 @@ namespace NWebDav.Server.Helpers
         /// <summary>
         /// Send an HTTP response with an XML body content.
         /// </summary>
-        /// <param name="response">
-        /// The HTTP response that needs to be sent.
-        /// </param>
-        /// <param name="statusCode">
-        /// WebDAV status code that should be set.
-        /// </param>
-        /// <param name="xDocument">
-        /// XML document that should be sent as the body of the message.
-        /// </param>
-        /// <returns>
-        /// A task that represents the asynchronous response send.
-        /// </returns>
+        /// <param name="response">The response<see cref="IHttpResponse"/>.</param>
+        /// <param name="statusCode">The statusCode<see cref="DavStatusCode"/>.</param>
+        /// <param name="xDocument">The xDocument<see cref="XDocument"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         public static async Task SendResponseAsync(this IHttpResponse response, DavStatusCode statusCode, XDocument xDocument)
         {
             // Make sure an XML document is specified

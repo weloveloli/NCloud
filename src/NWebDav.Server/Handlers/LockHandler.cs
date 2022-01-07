@@ -1,46 +1,38 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-using NWebDav.Server.Helpers;
-using NWebDav.Server.Http;
-using NWebDav.Server.Locking;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="LockHandler.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Handlers
 {
+    using System;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using System.Xml.Linq;
+    using NWebDav.Server.Helpers;
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Locking;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Implementation of the LOCK method.
     /// </summary>
-    /// <remarks>
-    /// The specification of the WebDAV LOCK method can be found in the
-    /// <see href="http://www.webdav.org/specs/rfc2518.html#METHOD_LOCK">
-    /// WebDAV specification
-    /// </see>.
-    /// </remarks>
     public class LockHandler : IRequestHandler
     {
         /// <summary>
         /// Handle a LOCK request.
         /// </summary>
-        /// <param name="httpContext">
-        /// The HTTP context of the request.
-        /// </param>
-        /// <param name="store">
-        /// Store that is used to access the collections and items.
-        /// </param>
-        /// <returns>
-        /// A task that represents the asynchronous LOCK operation. The task
-        /// will always return <see langword="true"/> upon completion.
-        /// </returns>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="store">The store<see cref="IStore"/>.</param>
+        /// <returns>The <see cref="Task{bool}"/>.</returns>
         public async Task<bool> HandleRequestAsync(IHttpContext httpContext, IStore store)
         {
             // Obtain request and response
             var request = httpContext.Request;
             var response = httpContext.Response;
-            
+
             // Determine the depth and requested timeout(s)
             var depth = request.GetDepth();
             var timeouts = request.GetTimeouts();

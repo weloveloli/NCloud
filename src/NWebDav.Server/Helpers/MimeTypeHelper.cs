@@ -1,18 +1,23 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
+// -----------------------------------------------------------------------
+// <copyright file="MimeTypeHelper.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Helpers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
     /// <summary>
     /// Helper class to determine the MIME type based on the file extension.
     /// </summary>
-    /// <remarks>
-    /// This class is derived from <see href="https://github.com/khellang/MimeTypes"/>
-    /// by <see href="mailto:kristian@hellang.com">Kristian Hellang (kristian@hellang.com)</see>.
-    /// </remarks>
     public static class MimeTypeHelper
     {
+        /// <summary>
+        /// Defines the s_typeMap.
+        /// </summary>
         private static readonly IDictionary<string, string> s_typeMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "123", "application/vnd.lotus-1-2-3" },
@@ -997,7 +1002,8 @@ namespace NWebDav.Server.Helpers
         };
 
         /// <summary>
-        /// The fallback MIME-type (efaults to <c>application/octet-stream</c>).
+        /// Gets the FallbackMimeType
+        /// The fallback MIME-type (efaults to <c>application/octet-stream</c>)..
         /// </summary>
         public static string FallbackMimeType { get; } = "application/octet-stream";
 

@@ -1,40 +1,31 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Threading.Tasks;
-
-using NWebDav.Server.Helpers;
-using NWebDav.Server.Http;
-using NWebDav.Server.Props;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="GetAndHeadHandler.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Handlers
 {
+    using System;
+    using System.Globalization;
+    using System.IO;
+    using System.Threading.Tasks;
+    using NWebDav.Server.Helpers;
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Props;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Implementation of the GET and HEAD method.
     /// </summary>
-    /// <remarks>
-    /// The specification of the WebDAV GET and HEAD methods for collections
-    /// can be found in the
-    /// <see href="http://www.webdav.org/specs/rfc2518.html#rfc.section.8.4">
-    /// WebDAV specification
-    /// </see>.
-    /// </remarks>
     public class GetAndHeadHandler : IRequestHandler
     {
         /// <summary>
         /// Handle a GET or HEAD request.
         /// </summary>
-        /// <param name="httpContext">
-        /// The HTTP context of the request.
-        /// </param>
-        /// <param name="store">
-        /// Store that is used to access the collections and items.
-        /// </param>
-        /// <returns>
-        /// A task that represents the asynchronous GET or HEAD operation. The
-        /// task will always return <see langword="true"/> upon completion.
-        /// </returns>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="store">The store<see cref="IStore"/>.</param>
+        /// <returns>The <see cref="Task{bool}"/>.</returns>
         public async Task<bool> HandleRequestAsync(IHttpContext httpContext, IStore store)
         {
             // Obtain request and response
@@ -118,7 +109,7 @@ namespace NWebDav.Server.Handlers
                             if (range != null)
                             {
                                 var start = range.Start ?? 0;
-                                var end = Math.Min(range.End ?? long.MaxValue, length-1);
+                                var end = Math.Min(range.End ?? long.MaxValue, length - 1);
                                 length = end - start + 1;
 
                                 // Write the range
@@ -159,6 +150,14 @@ namespace NWebDav.Server.Handlers
             return true;
         }
 
+        /// <summary>
+        /// The CopyToAsync.
+        /// </summary>
+        /// <param name="src">The src<see cref="Stream"/>.</param>
+        /// <param name="dest">The dest<see cref="Stream"/>.</param>
+        /// <param name="start">The start<see cref="long"/>.</param>
+        /// <param name="end">The end<see cref="long?"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
         private async Task CopyToAsync(Stream src, Stream dest, long start, long? end)
         {
             // Skip to the first offset
@@ -167,7 +166,7 @@ namespace NWebDav.Server.Handlers
                 // We prefer seeking instead of draining data
                 if (!src.CanSeek)
                     throw new IOException("Cannot use range, because the source stream isn't seekable");
-                
+
                 src.Seek(start, SeekOrigin.Begin);
             }
 
@@ -187,7 +186,7 @@ namespace NWebDav.Server.Handlers
                 // We're done, if we cannot read any data anymore
                 if (bytesRead == 0)
                     return;
-                
+
                 // Write the data to the destination stream
                 await dest.WriteAsync(buffer, 0, bytesRead).ConfigureAwait(false);
 

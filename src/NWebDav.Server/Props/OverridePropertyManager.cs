@@ -1,22 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-using NWebDav.Server.Http;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="OverridePropertyManager.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Props
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using System.Xml.Linq;
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Stores;
+
+    /// <summary>
+    /// Defines the <see cref="OverridePropertyManager{TEntry}" />.
+    /// </summary>
+    /// <typeparam name="TEntry">.</typeparam>
     public class OverridePropertyManager<TEntry> : IPropertyManager
         where TEntry : IStoreItem
     {
+        /// <summary>
+        /// Defines the _converter.
+        /// </summary>
         private readonly Func<TEntry, IStoreItem> _converter;
+
+        /// <summary>
+        /// Defines the _properties.
+        /// </summary>
         private readonly IDictionary<XName, DavProperty<TEntry>> _properties;
+
+        /// <summary>
+        /// Defines the _basePropertyManager.
+        /// </summary>
         private readonly IPropertyManager _basePropertyManager;
 
-        public OverridePropertyManager(IEnumerable<DavProperty<TEntry>> properties, IPropertyManager basePropertyManager, Func<TEntry, IStoreItem> converter = null)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OverridePropertyManager{TEntry}"/> class.
+        /// </summary>
+        /// <param name="properties">The properties<see cref="IEnumerable{DavProperty{TEntry}}"/>.</param>
+        /// <param name="basePropertyManager">The basePropertyManager<see cref="IPropertyManager"/>.</param>
+        /// <param name="converter">The converter<see cref="Func{TEntry, IStoreItem} ?"/>.</param>
+        public OverridePropertyManager(IEnumerable<DavProperty<TEntry>> properties, IPropertyManager basePropertyManager, Func<TEntry, IStoreItem>? converter = null)
         {
             // Convert the properties to a dictionary for fast retrieval
             _properties = properties?.ToDictionary(p => p.Name) ?? throw new ArgumentNullException(nameof(properties));
@@ -27,8 +53,19 @@ namespace NWebDav.Server.Props
             Properties = GetPropertyInfo();
         }
 
+        /// <summary>
+        /// Gets the Properties.
+        /// </summary>
         public IList<PropertyInfo> Properties { get; }
 
+        /// <summary>
+        /// The GetPropertyAsync.
+        /// </summary>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="item">The item<see cref="IStoreItem"/>.</param>
+        /// <param name="propertyName">The propertyName<see cref="XName"/>.</param>
+        /// <param name="skipExpensive">The skipExpensive<see cref="bool"/>.</param>
+        /// <returns>The <see cref="Task{object}"/>.</returns>
         public Task<object> GetPropertyAsync(IHttpContext httpContext, IStoreItem item, XName propertyName, bool skipExpensive = false)
         {
             // Find the property
@@ -47,6 +84,14 @@ namespace NWebDav.Server.Props
             return property.GetterAsync(httpContext, (TEntry)item);
         }
 
+        /// <summary>
+        /// The SetPropertyAsync.
+        /// </summary>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="item">The item<see cref="IStoreItem"/>.</param>
+        /// <param name="propertyName">The propertyName<see cref="XName"/>.</param>
+        /// <param name="value">The value<see cref="object"/>.</param>
+        /// <returns>The <see cref="Task{DavStatusCode}"/>.</returns>
         public Task<DavStatusCode> SetPropertyAsync(IHttpContext httpContext, IStoreItem item, XName propertyName, object value)
         {
             // Find the property
@@ -61,6 +106,10 @@ namespace NWebDav.Server.Props
             return property.SetterAsync(httpContext, (TEntry)item, value);
         }
 
+        /// <summary>
+        /// The GetPropertyInfo.
+        /// </summary>
+        /// <returns>The <see cref="IList{PropertyInfo}"/>.</returns>
         private IList<PropertyInfo> GetPropertyInfo()
         {
             // Obtain the base properties that do not have an override

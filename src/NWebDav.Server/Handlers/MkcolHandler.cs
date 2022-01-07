@@ -1,35 +1,27 @@
-﻿using System.Threading.Tasks;
-
-using NWebDav.Server.Helpers;
-using NWebDav.Server.Http;
-using NWebDav.Server.Stores;
+﻿// -----------------------------------------------------------------------
+// <copyright file="MkcolHandler.cs" company="Weloveloli">
+//    Copyright (c) 2021 weloveloli. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace NWebDav.Server.Handlers
 {
+    using System.Threading.Tasks;
+    using NWebDav.Server.Helpers;
+    using NWebDav.Server.Http;
+    using NWebDav.Server.Stores;
+
     /// <summary>
     /// Implementation of the MKCOL method.
     /// </summary>
-    /// <remarks>
-    /// The specification of the WebDAV MKCOL method can be found in the
-    /// <see href="http://www.webdav.org/specs/rfc2518.html#METHOD_MKCOL">
-    /// WebDAV specification
-    /// </see>.
-    /// </remarks>
     public class MkcolHandler : IRequestHandler
     {
         /// <summary>
         /// Handle a MKCOL request.
         /// </summary>
-        /// <param name="httpContext">
-        /// The HTTP context of the request.
-        /// </param>
-        /// <param name="store">
-        /// Store that is used to access the collections and items.
-        /// </param>
-        /// <returns>
-        /// A task that represents the asynchronous MKCOL operation. The task
-        /// will always return <see langword="true"/> upon completion.
-        /// </returns>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="store">The store<see cref="IStore"/>.</param>
+        /// <returns>The <see cref="Task{bool}"/>.</returns>
         public async Task<bool> HandleRequestAsync(IHttpContext httpContext, IStore store)
         {
             // Obtain request and response
