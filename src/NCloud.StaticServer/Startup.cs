@@ -6,6 +6,7 @@
 
 namespace NCloud.StaticServer
 {
+    using System;
     using System.Collections.Generic;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -50,11 +51,16 @@ namespace NCloud.StaticServer
         {
             var ncloud = Configuration.GetSection("NCloud").Get<NCloudStaticServerOptions>();
             services.AddHttpClient();
+            services.AddMemoryCache((cacheOption)=> {
+                cacheOption.SizeLimit = 1024;
+                cacheOption.ExpirationScanFrequency = TimeSpan.FromMinutes(5);
+            });
             services.AddSingleton<GitHubClient>();
             services.AddSingleton<INCloudFileProviderRegistry, DefaultNCloudFileProviderRegistry>();
             services.AddSingleton<INCloudFileProvider>(s => s.GetService<INCloudFileProviderRegistry>());
             services.AddSingleton<INCloudFileProviderFactory, DefaultNCloudFileProviderFactory>();
             services.AddSingleton<IContentTypeProvider, MimeContentTypeProvider>();
+            services.AddSingleton<ISystemConfigProvider>(ncloud);
             services.AddDirectoryBrowser();
             if (ncloud.FtpEnable)
             {

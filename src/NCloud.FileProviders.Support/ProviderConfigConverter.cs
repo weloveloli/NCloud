@@ -37,7 +37,7 @@ namespace NCloud.FileProviders.Support
                 fileProviderAssemblies.Add(Assembly.LoadFrom(dll));
             }
             var types = fileProviderAssemblies.SelectMany(e => e.GetExportedTypes())
-                .Where(e => e.IsSubclassOf(typeof(INCloudFileProvider)))
+                .Where(e => typeof(INCloudFileProvider).IsAssignableFrom(e))
                 .Where(e => e.GetCustomAttributes(typeof(FileProviderAttribute), false).Length == 1);
             this._providerConfigTypes = types
                 .Select(e => (((FileProviderAttribute)e.GetCustomAttributes(typeof(FileProviderAttribute), false)[0]).Type, e))
