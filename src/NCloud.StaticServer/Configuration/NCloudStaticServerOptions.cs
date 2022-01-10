@@ -77,7 +77,7 @@ namespace NCloud.StaticServer.Configuration
                 {
                     return _cacheFolder;
                 }
-                _configFolder = Path.Combine(Environment.CurrentDirectory, "cache");
+                _cacheFolder = Path.Combine(Environment.CurrentDirectory, "cache");
                 if (!Directory.Exists(_cacheFolder))
                 {
                     Directory.CreateDirectory(_cacheFolder);

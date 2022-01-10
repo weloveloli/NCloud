@@ -66,6 +66,8 @@ namespace NCloud.FileProviders.Support.Streams
         /// </summary>
         public string? ContentType { get; private set; }
 
+        public Action<HttpRequestMessage> PrepareRequest { get; set; }
+
         /// <summary>
         /// Gets or sets the BufferingSize
         /// Buffering size for downloading the file..
@@ -237,6 +239,10 @@ namespace NCloud.FileProviders.Support.Streams
             }
 
             var req = new HttpRequestMessage(HttpMethod.Get, _uri);
+            if(PrepareRequest != null)
+            {
+                PrepareRequest.Invoke(req);
+            }
             // Use "Range" header to sepcify the data offset and size
             req.Headers.Add("Range", $"bytes={offset}-{endPos - 1}");
 

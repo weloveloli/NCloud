@@ -62,7 +62,7 @@ namespace NCloud.FileProviders.Support
                 fileProviderAssemblies.Add(Assembly.LoadFrom(dll));
             }
             var types = fileProviderAssemblies.SelectMany(e => e.GetExportedTypes())
-                .Where(e => e.IsSubclassOf(typeof(INCloudFileProvider)));
+                .Where(e => typeof(INCloudFileProvider).IsAssignableFrom(e));
             this._providerTypes = types
                 .Where(e => e.GetCustomAttributes(typeof(FileProviderAttribute), false).Length == 1)
                 .Select(e => (((FileProviderAttribute)e.GetCustomAttributes(typeof(FileProviderAttribute), false)[0]).Type, e))
@@ -110,7 +110,7 @@ namespace NCloud.FileProviders.Support
                 throw new ArgumentException($"'{nameof(type)}' cannot be null or whitespace.", nameof(type));
             }
             var providerType = _providerTypes.GetOrDefault(type) ?? throw new ArgumentException($"'{nameof(type)}' is invalid, {type} is not support.", nameof(type));
-            if (!providerType.IsSubclassOf(typeof(INCloudFileProvider)))
+            if (!typeof(INCloudFileProvider).IsAssignableFrom(providerType))
             {
                 throw new ArgumentException($"'{nameof(providerType)}' {providerType} is invalid, must be subclass of INCloudFileProvider.", nameof(providerType));
             }

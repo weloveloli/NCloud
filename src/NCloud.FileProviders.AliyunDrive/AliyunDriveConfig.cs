@@ -20,7 +20,7 @@ namespace NCloud.FileProviders.AliyunDrive
         /// <summary>
         /// Gets the Type.
         /// </summary>
-        public override string Type => "aliyundrive";
+        public override string Type => AliyunDriveFileProvider.Type;
 
         /// <summary>
         /// Gets or sets the RefreshToken.
@@ -32,18 +32,19 @@ namespace NCloud.FileProviders.AliyunDrive
         /// </summary>
         /// <param name="configFolder">The configFolder<see cref="string"/>.</param>
         /// <returns>The <see cref="string"/>.</returns>
-        public string GetRefreshToken(string configFolder)
+        public (string refreshToken, DateTime expiredTime) GetRefreshToken(string configFolder)
         {
             var refreshTokenFile = Path.Combine(configFolder, $"refreshtoken-{this.HashKey()}");
             if (File.Exists(refreshTokenFile))
             {
-                return File.ReadAllText(refreshTokenFile);
+                var fileInfo = new FileInfo(refreshTokenFile);
+                return (File.ReadAllText(refreshTokenFile), fileInfo.LastAccessTimeUtc.AddSeconds(7200));
             }
             else
             {
                 File.WriteAllText(refreshTokenFile, RefreshToken);
+                return (File.ReadAllText(refreshTokenFile), DateTime.UtcNow);
             }
-            return RefreshToken;
         }
 
         /// <summary>

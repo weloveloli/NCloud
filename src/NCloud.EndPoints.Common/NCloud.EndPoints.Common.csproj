@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NCloud.FileProviders.Abstractions\NCloud.FileProviders.Abstractions.csproj" />
+    <ProjectReference Include="..\NCloud.FileProviders.AliyunDrive\NCloud.FileProviders.AliyunDrive.csproj" />
     <ProjectReference Include="..\NCloud.FileProviders.GitHub\NCloud.FileProviders.GitHub.csproj" />
     <ProjectReference Include="..\NCloud.FileProviders.Physical\NCloud.FileProviders.Physical.csproj" />
     <ProjectReference Include="..\NCloud.FileProviders.Virtual\NCloud.FileProviders.Virtual.csproj" />
