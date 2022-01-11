@@ -1,0 +1,14 @@
+version: '2.0'
+services:
+  ncloudstatic:
+    image: ncloud.static:latest
+    volumes:
+        - ./ncloud-static:/data
+    ports:
+        - "7080:80"
+        - "11111:11111"
+    environment: 
+        NCloud__FtpEnable: "false"
+        NCloud__StoreFile: "/data/store.json"
+        NCloud__ConfigFolder: "/data/config"
+        NCloud__CacheFolder: "/data/cache"

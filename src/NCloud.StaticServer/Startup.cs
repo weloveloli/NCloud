@@ -8,12 +8,14 @@ namespace NCloud.StaticServer
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.StaticFiles;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
     using NCloud.EndPoints.FTP;
     using NCloud.EndPoints.Static;
     using NCloud.EndPoints.WebDAV;
@@ -44,14 +46,20 @@ namespace NCloud.StaticServer
         public IConfiguration Configuration { get; }
 
         /// <summary>
+        /// Defines the ncloud.
+        /// </summary>
+        private NCloudStaticServerOptions ncloud;
+
+        /// <summary>
         /// The ConfigureServices.
         /// </summary>
         /// <param name="services">The services<see cref="IServiceCollection"/>.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            var ncloud = Configuration.GetSection("NCloud").Get<NCloudStaticServerOptions>();
+            this.ncloud = Configuration.GetSection("NCloud").Get<NCloudStaticServerOptions>();
             services.AddHttpClient();
-            services.AddMemoryCache((cacheOption)=> {
+            services.AddMemoryCache((cacheOption) =>
+            {
                 cacheOption.SizeLimit = 1024;
                 cacheOption.ExpirationScanFrequency = TimeSpan.FromMinutes(5);
             });
@@ -92,15 +100,31 @@ namespace NCloud.StaticServer
 
             app.UseHttpsRedirection();
             var service = app.ApplicationServices;
+            var logger = service.GetService<ILogger<Startup>>();
             var fileProvider = service.GetService<INCloudFileProviderFactory>();
             var dynamicFileProvider = service.GetService<INCloudFileProviderRegistry>();
-            var storeConfig = Configuration.GetSection("Store").Get<List<Dictionary<string,string>>>();
-            var stores = JsonConvert.DeserializeObject<List<BaseProviderConfig>>(JsonConvert.SerializeObject(storeConfig), new ProviderConfigConverter());
-            foreach (var store in stores)
+            List<BaseProviderConfig> stores;
+            string storeConfig;
+            var storeFile = ncloud.StoreFile;
+            if (!string.IsNullOrWhiteSpace(storeFile) && File.Exists(storeFile))
             {
-                if(store != null)
+                logger.LogInformation($"use storefile {storeFile}");
+                storeConfig = File.ReadAllText(storeFile);
+            }
+            else
+            {
+                storeConfig = JsonConvert.SerializeObject(Configuration.GetSection("Store").Get<List<Dictionary<string, string>>>());
+            }
+            stores = JsonConvert.DeserializeObject<List<BaseProviderConfig>>(storeConfig, new ProviderConfigConverter());
+            if (stores != null)
+            {
+                foreach (var store in stores)
                 {
-                    dynamicFileProvider.AddProvider(fileProvider.CreateProvider(store));
+                    if (store != null)
+                    {
+                        logger.LogInformation($"Enable {JsonConvert.SerializeObject(store)}");
+                        dynamicFileProvider.AddProvider(fileProvider.CreateProvider(store));
+                    }
                 }
             }
 
@@ -118,7 +142,6 @@ namespace NCloud.StaticServer
                 FileProvider = dynamicFileProvider,
                 RequestPath = ""
             });
-
         }
     }
 }

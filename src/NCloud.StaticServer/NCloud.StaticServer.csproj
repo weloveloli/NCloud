@@ -43,5 +43,7 @@
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
     <Copy SourceFiles="@(AssetsSourceFiles)" DestinationFolder="$(OutDir)/example" SkipUnchangedFiles="true" />
   </Target>
-  
+  <Target Name="CopyCustomContentWhenPublish" AfterTargets="PrepareForPublish">
+    <Copy SourceFiles="@(AssetsSourceFiles)" DestinationFolder="$(PublishDir)/example" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

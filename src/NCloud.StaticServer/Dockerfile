@@ -6,13 +6,14 @@ EXPOSE 80
 EXPOSE 443
 EXPOSE 21
 EXPOSE 10000-10099
+EXPOSE 11111
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["NCloud.StaticServer/NCloud.StaticServer.csproj", "NCloud.StaticServer/"]
-RUN dotnet restore "NCloud.StaticServer/NCloud.StaticServer.csproj"
+COPY ["src/NCloud.StaticServer/NCloud.StaticServer.csproj", "src/NCloud.StaticServer/"]
+RUN dotnet restore "src/NCloud.StaticServer/NCloud.StaticServer.csproj"
 COPY . .
-WORKDIR "/src/NCloud.StaticServer"
+WORKDIR "/src/src/NCloud.StaticServer"
 RUN dotnet build "NCloud.StaticServer.csproj" -c Release -o /app/build
 
 FROM build AS publish

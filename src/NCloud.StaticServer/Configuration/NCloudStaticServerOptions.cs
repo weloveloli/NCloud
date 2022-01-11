@@ -23,7 +23,7 @@ namespace NCloud.StaticServer.Configuration
         public FtpOptions Ftp { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the ftp endpoint is Enable......
+        /// Gets or sets a value indicating whether the ftp endpoint is Enable.......
         /// </summary>
         public bool FtpEnable { get; set; }
 
@@ -48,6 +48,11 @@ namespace NCloud.StaticServer.Configuration
         private string _cacheFolder;
 
         /// <summary>
+        /// Gets or sets the StoreFile.
+        /// </summary>
+        public string StoreFile { get; set; }
+
+        /// <summary>
         /// Gets or sets the ConfigFolder.
         /// </summary>
         public string ConfigFolder {
@@ -65,6 +70,10 @@ namespace NCloud.StaticServer.Configuration
             }
             set {
                 _configFolder = value;
+                if (!Directory.Exists(_configFolder))
+                {
+                    Directory.CreateDirectory(_configFolder);
+                }
             }
         }
 
@@ -86,6 +95,10 @@ namespace NCloud.StaticServer.Configuration
             }
             set {
                 _cacheFolder = value;
+                if (!Directory.Exists(_cacheFolder))
+                {
+                    Directory.CreateDirectory(_cacheFolder);
+                }
             }
         }
     }

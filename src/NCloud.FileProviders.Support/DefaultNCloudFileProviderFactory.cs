@@ -93,7 +93,7 @@ namespace NCloud.FileProviders.Support
             }
             catch (Exception e)
             {
-                this.logger?.LogError("CreateProvider Failed", e);
+                this.logger?.LogError(e,"CreateProvider Failed");
                 return null;
             }
         }
