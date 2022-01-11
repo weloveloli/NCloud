@@ -1,4 +1,4 @@
-name: Publish to Registry
+name: Publish nupkg
 on:    
   release:
       types: [published]

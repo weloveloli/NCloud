@@ -1,7 +1,7 @@
 version: '2.0'
 services:
   ncloudstatic:
-    image: ncloud.static:latest
+    image: weloveloli/ncloud-static:latest
     volumes:
         - ./ncloud-static:/data
     ports:
