@@ -20,9 +20,11 @@ namespace NCloud.StaticServer
     using NCloud.EndPoints.Static;
     using NCloud.EndPoints.WebDAV;
     using NCloud.EndPoints.WebDAV.Extensions;
+    using NCloud.EndPoints.WebDAV.Logging;
     using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.GitHub;
     using NCloud.FileProviders.Support;
+    using NCloud.FileProviders.Support.Logger;
     using NCloud.StaticServer.Configuration;
     using Newtonsoft.Json;
 
@@ -60,7 +62,7 @@ namespace NCloud.StaticServer
             services.AddHttpClient();
             services.AddMemoryCache((cacheOption) =>
             {
-                cacheOption.SizeLimit = 1024;
+                cacheOption.SizeLimit = 4096;
                 cacheOption.ExpirationScanFrequency = TimeSpan.FromMinutes(5);
             });
             services.AddSingleton<GitHubClient>();
@@ -85,8 +87,13 @@ namespace NCloud.StaticServer
         /// </summary>
         /// <param name="app">The app<see cref="IApplicationBuilder"/>.</param>
         /// <param name="env">The env<see cref="IWebHostEnvironment"/>.</param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            ApplicationLogging.LoggerFactory = loggerFactory;
+            if (ncloud.WebDAVEnable)
+            {
+                NWebDav.Server.Logging.LoggerFactory.Factory = new WebDavLoggerFactory();
+            }
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

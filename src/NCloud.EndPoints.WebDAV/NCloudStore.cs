@@ -8,6 +8,7 @@ namespace NCloud.EndPoints.WebDAV
 {
     using System;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using NCloud.EndPoints.WebDAV.Models;
     using NCloud.FileProviders.Abstractions;
     using NCloud.Utils;
@@ -27,6 +28,11 @@ namespace NCloud.EndPoints.WebDAV
         private readonly INCloudFileProvider iNCloudFileProvider;
 
         /// <summary>
+        /// Defines the logger.
+        /// </summary>
+        private readonly ILogger<NCloudStore> logger;
+
+        /// <summary>
         /// Gets the LockingManager.
         /// </summary>
         public ILockingManager LockingManager { get; }
@@ -36,10 +42,12 @@ namespace NCloud.EndPoints.WebDAV
         /// </summary>
         /// <param name="iNCloudFileProvider">The iNCloudFileProvider<see cref="INCloudFileProvider"/>.</param>
         /// <param name="lockingManager">The lockingManager<see cref="ILockingManager"/>.</param>
-        public NCloudStore(INCloudFileProvider iNCloudFileProvider, ILockingManager lockingManager = null)
+        /// <param name="logger">The logger<see cref="ILogger{NCloudStore}"/>.</param>
+        public NCloudStore(INCloudFileProvider iNCloudFileProvider, ILogger<NCloudStore> logger, ILockingManager lockingManager = null)
         {
             this.iNCloudFileProvider = iNCloudFileProvider;
             this.LockingManager = lockingManager ?? new InMemoryLockingManager();
+            this.logger = logger;
         }
 
         /// <summary>
@@ -50,16 +58,12 @@ namespace NCloud.EndPoints.WebDAV
         /// <returns>The <see cref="Task{IStoreCollection}"/>.</returns>
         public Task<IStoreCollection> GetCollectionAsync(Uri uri, IHttpContext httpContext)
         {
+            this.logger.LogDebug("GetCollectionAsync {uri}", uri);
             // Determine the path from the uri
             var path = GetPathFromUri(uri);
-            var fileInfo = this.iNCloudFileProvider.GetFileInfo(path);
-            if (!fileInfo.Exists && !fileInfo.IsDirectory)
-            {
-                return Task.FromResult<IStoreCollection>(null);
-            }
             var content = iNCloudFileProvider.GetDirectoryContents(path);
-
-            return Task.FromResult<IStoreCollection>(new NCloudStoreCollection(LockingManager, path, content, fileInfo.Name, this.iNCloudFileProvider));
+            var name = path.Substring(path.LastIndexOf('/') + 1);
+            return Task.FromResult<IStoreCollection>(new NCloudStoreCollection(LockingManager, path, content, name, this.iNCloudFileProvider));
         }
 
         /// <summary>
@@ -70,6 +74,7 @@ namespace NCloud.EndPoints.WebDAV
         /// <returns>The <see cref="Task{IStoreItem}"/>.</returns>
         public Task<IStoreItem> GetItemAsync(Uri uri, IHttpContext httpContext)
         {
+            this.logger.LogDebug("GetItemAsync {uri}", uri);
             // Determine the path from the uri
             var path = GetPathFromUri(uri);
             var fileInfo = this.iNCloudFileProvider.GetFileInfo(path);

@@ -11,6 +11,7 @@ namespace NCloud.FileProviders.WebDAV
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
+    using NCloud.FileProviders.Support.Logger;
     using NCloud.FileProviders.Support.Streams;
     using WebDAVClient;
     using WebDAVClient.Model;
@@ -33,7 +34,7 @@ namespace NCloud.FileProviders.WebDAV
         /// <summary>
         /// Defines the logger.
         /// </summary>
-        private ILogger<WebDAVFileProvider> logger;
+        private ILogger<WebDAVStream> logger;
 
         /// <summary>
         /// Defines the _bufferingSize.
@@ -79,11 +80,11 @@ namespace NCloud.FileProviders.WebDAV
         /// <param name="client">The client<see cref="IClient"/>.</param>
         /// <param name="logger">The logger<see cref="ILogger{WebDAVFileProvider}"/>.</param>
         /// <param name="cachePageSize">The cachePageSize<see cref="int"/>.</param>
-        public WebDAVStream(Item item, IClient client, ILogger<WebDAVFileProvider> logger, int cachePageSize = 256 * 1024 ) : base(new MemoryStream(), true, cachePageSize)
+        public WebDAVStream(Item item, IClient client, int cachePageSize = 256 * 1024 ) : base(new MemoryStream(), true, cachePageSize)
         {
             this.client = client;
             this.item = item;
-            this.logger = logger;
+            this.logger = ApplicationLogging.CreateLogger<WebDAVStream>();
             this.BufferingSize = cachePageSize;
             streamLengthAvailable = item.ContentLength.HasValue;
         }
@@ -113,7 +114,7 @@ namespace NCloud.FileProviders.WebDAV
         /// <returns>The <see cref="Task{int}"/>.</returns>
         protected async override Task<int> LoadAsync(Stream stream, int offset, int length, CancellationToken cancellationToken)
         {
-            logger.LogDebug("Load Async offset:{} length:{}", offset, length);
+            logger?.LogDebug("Load Async offset:{} length:{}", offset, length);
             if (offset >= this.Length)
             {
                 return 0;

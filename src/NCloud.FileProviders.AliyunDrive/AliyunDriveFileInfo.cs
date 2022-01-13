@@ -8,11 +8,15 @@ namespace NCloud.FileProviders.AliyunDrive
 {
     using System;
     using System.IO;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.AliyunDrive.AliyunDriveAPI.Models;
-    using NCloud.FileProviders.Support.Streams;
+    using NCloud.FileProviders.Support.Logger;
+    using NCloud.Utils;
 
     /// <summary>
     /// Defines the <see cref="AliyunDriveFileInfo" />.
@@ -30,14 +34,23 @@ namespace NCloud.FileProviders.AliyunDrive
         private readonly AliyunDriveClient client;
 
         /// <summary>
+        /// Defines the httpClient.
+        /// </summary>
+        private readonly HttpClient httpClient;
+        private readonly ILogger<AliyunDriveFileInfo> logger;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AliyunDriveFileInfo"/> class.
         /// </summary>
         /// <param name="item">The item<see cref="FileItem"/>.</param>
         /// <param name="client">The client<see cref="AliyunDriveClient"/>.</param>
-        public AliyunDriveFileInfo(FileItem item, AliyunDriveClient client)
+        /// <param name="httpClient">The httpClient<see cref="HttpClient"/>.</param>
+        public AliyunDriveFileInfo(FileItem item, AliyunDriveClient client, HttpClient httpClient)
         {
             this.item = item;
             this.client = client;
+            this.httpClient = httpClient;
+            this.logger = ApplicationLogging.CreateLogger<AliyunDriveFileInfo>();
         }
 
         /// <summary>
@@ -83,7 +96,20 @@ namespace NCloud.FileProviders.AliyunDrive
         /// <returns>The <see cref="Stream"/>.</returns>
         public Stream CreateReadStream(long startPosition, long? endPosition = null)
         {
-            throw new NotImplementedException();
+            //if(startPosition == 0 && !endPosition.HasValue)
+            //{
+            //    return CreateReadStream();
+            //}
+            logger.LogDebug("CreateReadStream startPosition {startPosition}, endPosition {endPosition}", startPosition, endPosition);
+            Check.CheckIndex(startPosition, endPosition, this.Length);
+            var downRes = this.client.GetDownloadLinkAsync(item.FileId).Result;
+            Check.CheckIndex(startPosition, endPosition, this.Length);
+            var request = new HttpRequestMessage { RequestUri = new Uri(downRes.Url) };
+            request.Headers.Add("referer", "https://www.aliyundrive.com/");
+            request.Headers.Range = new RangeHeaderValue(startPosition, endPosition);
+            var res = httpClient.SendAsync(request).Result;
+            res.EnsureSuccessStatusCode();
+            return res.Content.ReadAsStreamAsync().Result;
         }
 
         /// <summary>
@@ -92,13 +118,7 @@ namespace NCloud.FileProviders.AliyunDrive
         /// <returns>The <see cref="Stream"/>.</returns>
         public Stream CreateReadStream()
         {
-            return new HttpStream(new Uri(item.DownloadUrl))
-            {
-                PrepareRequest = (req) =>
-                {
-                    req.Headers.Add("referer", "https://www.aliyundrive.com/");
-                }
-            };
+            return new AliyunDriveStream(item, client);
         }
 
         /// <summary>
@@ -106,14 +126,9 @@ namespace NCloud.FileProviders.AliyunDrive
         /// </summary>
         /// <param name="cancellationToken">The cancellationToken<see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="Task{Stream}"/>.</returns>
-        public async Task<Stream> CreateReadStreamAsync(CancellationToken cancellationToken = default)
+        public Task<Stream> CreateReadStreamAsync(CancellationToken cancellationToken = default)
         {
-            var stream = await HttpStream.CreateAsync(new Uri(item.DownloadUrl));
-            stream.PrepareRequest = (req) =>
-                {
-                    req.Headers.Add("referer", "https://www.aliyundrive.com/");
-                };
-            return stream;
+            return Task.FromResult<Stream>(new AliyunDriveStream(item, client));
         }
 
         /// <summary>
@@ -123,9 +138,21 @@ namespace NCloud.FileProviders.AliyunDrive
         /// <param name="endPosition">The endPosition<see cref="long?"/>.</param>
         /// <param name="token">The token<see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="Task{Stream}"/>.</returns>
-        public Task<Stream> CreateReadStreamAsync(long startPosition, long? endPosition = null, CancellationToken token = default)
+        public async Task<Stream> CreateReadStreamAsync(long startPosition, long? endPosition = null, CancellationToken token = default)
         {
-            throw new NotImplementedException();
+            logger.LogDebug("CreateReadStreamAsync startPosition {startPosition}, endPosition {endPosition}", startPosition, endPosition);
+            //if (startPosition == 0 && !endPosition.HasValue)
+            //{
+            //    return new AliyunDriveStream(item, client);
+            //}
+            Check.CheckIndex(startPosition, endPosition, this.Length);
+            var downRes = await this.client.GetDownloadLinkAsync(item.FileId);
+            var request = new HttpRequestMessage { RequestUri = new Uri(downRes.Url) };
+            request.Headers.Range = new RangeHeaderValue(startPosition, endPosition);
+            request.Headers.Add("referer", "https://www.aliyundrive.com/");
+            var res = await httpClient.SendAsync(request, token);
+            res.EnsureSuccessStatusCode();
+            return await res.Content.ReadAsStreamAsync();
         }
     }
 }

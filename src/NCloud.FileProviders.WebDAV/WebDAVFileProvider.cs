@@ -76,7 +76,7 @@ namespace NCloud.FileProviders.WebDAV
             }
             else
             {
-                return new WebDAVFileInfo(item, client, logger);
+                return new WebDAVFileInfo(item, client);
             }
         }
 

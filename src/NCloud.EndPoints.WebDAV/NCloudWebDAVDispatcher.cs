@@ -7,6 +7,7 @@
 namespace NCloud.EndPoints.WebDAV
 {
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using NWebDav.Server;
     using NWebDav.Server.Http;
     using NWebDav.Server.Stores;
@@ -17,6 +18,11 @@ namespace NCloud.EndPoints.WebDAV
     public class NCloudWebDAVDispatcher : IWebDavDispatcher
     {
         /// <summary>
+        /// Defines the logger.
+        /// </summary>
+        private readonly ILogger<NCloudWebDAVDispatcher> logger;
+
+        /// <summary>
         /// Defines the dispatcher.
         /// </summary>
         private WebDavDispatcher dispatcher;
@@ -25,10 +31,12 @@ namespace NCloud.EndPoints.WebDAV
         /// Initializes a new instance of the <see cref="NCloudWebDAVDispatcher"/> class.
         /// </summary>
         /// <param name="store">The store<see cref="IStore"/>.</param>
-        public NCloudWebDAVDispatcher(IStore store)
+        /// <param name="logger">The logger<see cref="ILogger{NCloudWebDAVDispatcher}"/>.</param>
+        public NCloudWebDAVDispatcher(IStore store, ILogger<NCloudWebDAVDispatcher> logger)
         {
             var requestHandlerFactory = new RequestHandlerFactory();
             this.dispatcher = new WebDavDispatcher(store, requestHandlerFactory);
+            this.logger = logger;
         }
 
         /// <summary>
@@ -38,6 +46,7 @@ namespace NCloud.EndPoints.WebDAV
         /// <returns>The <see cref="Task"/>.</returns>
         public Task DispatchRequestAsync(IHttpContext httpContext)
         {
+            logger.LogDebug("DispatchRequestAsync url:{url}, method:{method}", httpContext.Request.Url, httpContext.Request.HttpMethod);
             return dispatcher.DispatchRequestAsync(httpContext);
         }
     }

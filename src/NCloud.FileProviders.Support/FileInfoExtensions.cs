@@ -225,6 +225,24 @@ namespace NCloud.FileProviders.Support
         }
 
         /// <summary>
+        /// The IsRandomAccess.
+        /// </summary>
+        /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
+        /// <returns>The <see cref="bool"/>.</returns>
+        public static bool IsRandomAccess(this IFileInfo fileInfo)
+        {
+            if (fileInfo is IRandomAccessFileInfo)
+            {
+                return true;
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return IsRandomAccess(decorator.InnerIFileInfo);
+            }
+            return false;
+        }
+
+        /// <summary>
         /// The CreateReadStream.
         /// </summary>
         /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
@@ -232,7 +250,7 @@ namespace NCloud.FileProviders.Support
         /// <param name="endPosition">The endPosition<see cref="long?"/>.</param>
         /// <param name="token">The token<see cref="CancellationToken"/>.</param>
         /// <returns>The <see cref="Stream"/>.</returns>
-        public static Task<Stream> CreateReadStreamAsync(this IFileInfo fileInfo, long startPosition, long? endPosition, CancellationToken token)
+        public static Task<Stream> CreateReadStreamAsync(this IFileInfo fileInfo, long startPosition, long? endPosition, CancellationToken token = default)
         {
             Check.NotNull(fileInfo, nameof(fileInfo));
 

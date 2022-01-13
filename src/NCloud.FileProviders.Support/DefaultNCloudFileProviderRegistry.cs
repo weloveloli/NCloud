@@ -113,6 +113,11 @@ namespace NCloud.FileProviders.Support
                 {
                     return new VirtualFileInfo(subpath);
                 }
+                if(_compositeFileProvider == null)
+                {
+                    return new NotFoundFileInfo(subpath);
+
+                }
                 return _compositeFileProvider.GetFileInfo(subpath);
 
             }

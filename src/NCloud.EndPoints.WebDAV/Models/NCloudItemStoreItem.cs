@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="NCloudItemStore.cs" company="Weloveloli">
+// <copyright file="NCloudItemStoreItem.cs" company="Weloveloli">
 //    Copyright (c) 2021 weloveloli. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -20,7 +20,7 @@ namespace NCloud.EndPoints.WebDAV.Models
     /// <summary>
     /// Defines the <see cref="NCloudItemStore" />.
     /// </summary>
-    internal class NCloudItemStoreItem : IStoreItem
+    internal class NCloudItemStoreItem : IStoreItem, IRandomAccessStoreItem
     {
         /// <summary>
         /// Defines the fileInfo.
@@ -28,9 +28,10 @@ namespace NCloud.EndPoints.WebDAV.Models
         private readonly IFileInfo fileInfo;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NCloudItemStore"/> class.
+        /// Initializes a new instance of the <see cref="NCloudItemStoreItem"/> class.
         /// </summary>
         /// <param name="fileInfo">The fileInfo<see cref="IFileInfo"/>.</param>
+        /// <param name="lockingManager">The lockingManager<see cref="ILockingManager"/>.</param>
         public NCloudItemStoreItem(IFileInfo fileInfo, ILockingManager lockingManager)
         {
             this.fileInfo = fileInfo;
@@ -53,7 +54,8 @@ namespace NCloud.EndPoints.WebDAV.Models
         public IPropertyManager PropertyManager => DefaultPropertyManager;
 
         /// <summary>
-        /// Gets the LockingManager.
+        /// Gets or sets the LockingManager
+        /// Gets the LockingManager...
         /// </summary>
         public ILockingManager LockingManager { get; set; }
 
@@ -91,6 +93,39 @@ namespace NCloud.EndPoints.WebDAV.Models
             return Task.FromResult(DavStatusCode.PreconditionFailed);
         }
 
+        /// <summary>
+        /// The SupportRangeAccess.
+        /// </summary>
+        /// <returns>The <see cref="bool"/>.</returns>
+        public bool SupportRangeAccess()
+        {
+            return this.fileInfo.IsRandomAccess();
+        }
+
+        /// <summary>
+        /// The GetReadableStreamAsync.
+        /// </summary>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="startPoint">The startPoint<see cref="long"/>.</param>
+        /// <param name="endPoint">The endPoint<see cref="long"/>.</param>
+        /// <returns>The <see cref="Task{Stream}"/>.</returns>
+        public Task<Stream> GetReadableStreamAsync(IHttpContext httpContext, long startPoint, long? endPoint)
+        {
+            return this.fileInfo.CreateReadStreamAsync(startPoint, endPoint);
+        }
+
+        /// <summary>
+        /// The TotalLength.
+        /// </summary>
+        /// <returns>The <see cref="long"/>.</returns>
+        public long TotalLength()
+        {
+            return this.fileInfo.Length;
+        }
+
+        /// <summary>
+        /// Gets the DefaultPropertyManager.
+        /// </summary>
         public static PropertyManager<NCloudItemStoreItem> DefaultPropertyManager { get; } = new PropertyManager<NCloudItemStoreItem>(new DavProperty<NCloudItemStoreItem>[]
         {
             // RFC-2518 properties

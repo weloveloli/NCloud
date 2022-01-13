@@ -55,7 +55,7 @@ namespace NCloud.EndPoints.WebDAV.Models
         /// <summary>
         /// Gets the InfiniteDepthMode.
         /// </summary>
-        public InfiniteDepthMode InfiniteDepthMode => throw new NotImplementedException();
+        public InfiniteDepthMode InfiniteDepthMode => InfiniteDepthMode.Assume0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NCloudStoreCollection"/> class.

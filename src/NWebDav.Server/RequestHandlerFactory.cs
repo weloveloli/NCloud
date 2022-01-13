@@ -12,12 +12,13 @@ namespace NWebDav.Server
 
     /// <summary>
     /// Default implementation of the <see cref="IRequestHandlerFactory"/>
-    /// interface to create WebDAV request handlers. 
+    /// interface to create WebDAV request handlers.
     /// </summary>
-    /// <seealso cref="IRequestHandler"/>
-    /// <seealso cref="IRequestHandlerFactory"/>
     public class RequestHandlerFactory : IRequestHandlerFactory
     {
+        /// <summary>
+        /// Defines the s_requestHandlers.
+        /// </summary>
         private static readonly IDictionary<string, IRequestHandler> s_requestHandlers = new Dictionary<string, IRequestHandler>
         {
             { "COPY", new CopyHandler() },
@@ -38,18 +39,8 @@ namespace NWebDav.Server
         /// Obtain the <seealso cref="IRequestHandler">request handler</seealso>
         /// that can process the specified request.
         /// </summary>
-        /// <param name="httpContext">
-        /// The HTTP context specifies the entire HTTP context for this
-        /// request. In most cases only the <see cref="IHttpRequest.HttpMethod"/>
-        /// of the request will specify which handler should be used.
-        /// </param>
-        /// <returns>
-        /// The request handler that will further process the request.
-        /// </returns>
-        /// <remarks>
-        /// This implementation creates a new instance of the appropriate
-        /// request handler for each request.
-        /// </remarks>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <returns>The <see cref="IRequestHandler"/>.</returns>
         public IRequestHandler GetRequestHandler(IHttpContext httpContext)
         {
             // Obtain the dispatcher
@@ -61,8 +52,14 @@ namespace NWebDav.Server
         }
 
         /// <summary>
-        /// Gets a list of supported HTTP methods.
+        /// Gets the AllowedMethods
+        /// Gets a list of supported HTTP methods..
         /// </summary>
         public static IEnumerable<string> AllowedMethods => s_requestHandlers.Keys;
+
+        /// <summary>
+        /// Gets the ReadOnlyMethods.
+        /// </summary>
+        public static IEnumerable<string> ReadOnlyMethods => new string[] { "GET", "HEAD", "OPTIONS" };
     }
 }

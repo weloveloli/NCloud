@@ -14,6 +14,8 @@ namespace NCloud.FileProviders.Support.Streams
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
+    using NCloud.FileProviders.Support.Logger;
 
     /// <summary>
     /// Implements randomly accessible <see cref="Stream"/> on HTTP 1.1 transport.
@@ -23,7 +25,7 @@ namespace NCloud.FileProviders.Support.Streams
         /// <summary>
         /// Defines the _uri.
         /// </summary>
-        public readonly Uri _uri;
+        protected Uri _uri;
 
         /// <summary>
         /// Defines the _httpClient.
@@ -44,33 +46,36 @@ namespace NCloud.FileProviders.Support.Streams
         /// Gets the StreamLength
         /// Size in bytes of the file data downloaded so far if available; otherwise it returns <see cref="long.MaxValue"/>.
         /// <seealso cref="IsStreamLengthAvailable"/>
-        /// <seealso cref="GetStreamLengthOrDefault"/>.
+        /// <seealso cref="GetStreamLengthOrDefault"/>..
         /// </summary>
-        public long StreamLength { get; private set; }
+        public long StreamLength { get; protected set; }
 
         /// <summary>
         /// Gets a value indicating whether InspectionFinished
-        /// Whether file properties, like file size and last modified time is correctly inspected..
+        /// Whether file properties, like file size and last modified time is correctly inspected...
         /// </summary>
-        public bool InspectionFinished { get; private set; }
+        public bool InspectionFinished { get; protected set; }
 
         /// <summary>
         /// Gets the LastModified
-        /// When the file is last modified..
+        /// When the file is last modified...
         /// </summary>
-        public DateTime LastModified { get; private set; }
+        public DateTime LastModified { get; protected set; }
 
         /// <summary>
         /// Gets the ContentType
-        /// Content type of the file..
+        /// Content type of the file...
         /// </summary>
-        public string? ContentType { get; private set; }
+        public string? ContentType { get; protected set; }
 
+        /// <summary>
+        /// Gets or sets the PrepareRequest.
+        /// </summary>
         public Action<HttpRequestMessage> PrepareRequest { get; set; }
 
         /// <summary>
         /// Gets or sets the BufferingSize
-        /// Buffering size for downloading the file..
+        /// Buffering size for downloading the file...
         /// </summary>
         public int BufferingSize {
             get => _bufferingSize;
@@ -83,6 +88,8 @@ namespace NCloud.FileProviders.Support.Streams
                 _bufferingSize = value;
             }
         }
+
+        private readonly ILogger<HttpStream> logger;
 
         /// <summary>
         /// The bitCount.
@@ -106,7 +113,7 @@ namespace NCloud.FileProviders.Support.Streams
         }
 
         /// <summary>
-        /// Default cache page size; 32KB.
+        /// Default cache page size; 32KB..
         /// </summary>
         public const int DefaultCachePageSize = 32 * 1024;
 
@@ -160,7 +167,6 @@ namespace NCloud.FileProviders.Support.Streams
         /// <param name="cached">Cached flags for the pages in packed bits if any; otherwise it can be <c>null</c>.</param>
         /// <param name="httpClient"><see cref="HttpClient"/> to use on creating HTTP requests or <c>null</c> to use a default <see cref="HttpClient"/>.</param>
         /// <param name="dispatcherInvoker">Function called on every call to synchronous <see cref="HttpStream.Read(byte[], int, int)"/> call to invoke <see cref="HttpStream.ReadAsync(byte[], int, int, CancellationToken)"/>.</param>
-        [Obsolete("Please use the CreateAsync(Uri, Stream, bool, int, byte[]?, HttpClient?, DispatcherInvoker?, CancellationToken) static method instead.")]
         public HttpStream(Uri uri, Stream cache, bool ownStream, int cachePageSize, byte[]? cached, HttpClient? httpClient, DispatcherInvoker? dispatcherInvoker)
             : base(cache, ownStream, cachePageSize, cached, dispatcherInvoker)
         {
@@ -177,6 +183,7 @@ namespace NCloud.FileProviders.Support.Streams
                 _ownHttpClient = false;
             }
             BufferingSize = cachePageSize;
+            this.logger = ApplicationLogging.CreateLogger<HttpStream>();
         }
 
         /// <summary>
@@ -201,19 +208,19 @@ namespace NCloud.FileProviders.Support.Streams
 
         /// <summary>
         /// Gets or sets a value indicating whether IsStreamLengthAvailable
-        /// Determine whether stream length is determined or not..
+        /// Determine whether stream length is determined or not...
         /// </summary>
         public override bool IsStreamLengthAvailable { get; protected set; }
 
         /// <summary>
         /// Gets the LastHttpStatusCode
-        /// Last HTTP status code..
+        /// Last HTTP status code...
         /// </summary>
         public System.Net.HttpStatusCode LastHttpStatusCode { get; private set; }
 
         /// <summary>
         /// Gets the LastReasonPhrase
-        /// Last reason phrase obtained with <see cref="LastHttpStatusCode"/>..
+        /// Last reason phrase obtained with <see cref="LastHttpStatusCode"/>...
         /// </summary>
         public string? LastReasonPhrase { get; private set; }
 
@@ -227,6 +234,7 @@ namespace NCloud.FileProviders.Support.Streams
         /// <returns>The byte range actually downloaded. It may be larger than the requested range.</returns>
         protected override async Task<int> LoadAsync(Stream stream, int offset, int length, CancellationToken cancellationToken)
         {
+            logger?.LogDebug("Load Async offset:{} length:{}", offset, length);
             if (length == 0)
             {
                 return 0;
@@ -239,7 +247,7 @@ namespace NCloud.FileProviders.Support.Streams
             }
 
             var req = new HttpRequestMessage(HttpMethod.Get, _uri);
-            if(PrepareRequest != null)
+            if (PrepareRequest != null)
             {
                 PrepareRequest.Invoke(req);
             }
@@ -381,13 +389,13 @@ namespace NCloud.FileProviders.Support.Streams
     {
         /// <summary>
         /// Gets or sets the Offset
-        /// The offset of the data downloaded..
+        /// The offset of the data downloaded...
         /// </summary>
         public long Offset { get; set; }
 
         /// <summary>
         /// Gets or sets the Length
-        /// The length of the data downloaded..
+        /// The length of the data downloaded...
         /// </summary>
         public long Length { get; set; }
     }

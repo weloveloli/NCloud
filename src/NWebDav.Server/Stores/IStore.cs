@@ -41,6 +41,8 @@ namespace NWebDav.Server.Stores
         }
 
 
+
+
         public static bool operator !=(StoreItemResult left, StoreItemResult right)
         {
             return !(left == right);
@@ -92,6 +94,8 @@ namespace NWebDav.Server.Stores
             Result = result;
             Collection = collection;
         }
+
+
 
 
         public static bool operator !=(StoreCollectionResult left, StoreCollectionResult right)
@@ -147,7 +151,6 @@ namespace NWebDav.Server.Stores
     /// </summary>
     public interface IStoreItem
     {
-        // Item properties
         /// <summary>
         /// Gets the Name.
         /// </summary>
@@ -158,7 +161,6 @@ namespace NWebDav.Server.Stores
         /// </summary>
         string UniqueKey { get; }
 
-        // Read/Write access to the data
         /// <summary>
         /// The GetReadableStreamAsync.
         /// </summary>
@@ -174,7 +176,6 @@ namespace NWebDav.Server.Stores
         /// <returns>The <see cref="Task{DavStatusCode}"/>.</returns>
         Task<DavStatusCode> UploadFromStreamAsync(IHttpContext httpContext, Stream source);
 
-        // Copy support
         /// <summary>
         /// The CopyAsync.
         /// </summary>
@@ -185,13 +186,11 @@ namespace NWebDav.Server.Stores
         /// <returns>The <see cref="Task{StoreItemResult}"/>.</returns>
         Task<StoreItemResult> CopyAsync(IStoreCollection destination, string name, bool overwrite, IHttpContext httpContext);
 
-        // Property support
         /// <summary>
         /// Gets the PropertyManager.
         /// </summary>
         IPropertyManager PropertyManager { get; }
 
-        // Locking support
         /// <summary>
         /// Gets the LockingManager.
         /// </summary>
@@ -199,11 +198,37 @@ namespace NWebDav.Server.Stores
     }
 
     /// <summary>
+    /// Defines the <see cref="IRandomAccessStoreItem" />.
+    /// </summary>
+    public interface IRandomAccessStoreItem
+    {
+        /// <summary>
+        /// The SupportRangeAccess.
+        /// </summary>
+        /// <returns>The <see cref="bool"/>.</returns>
+        public bool SupportRangeAccess();
+
+        /// <summary>
+        /// The TotalLength.
+        /// </summary>
+        /// <returns>The <see cref="long"/>.</returns>
+        public long TotalLength();
+
+        /// <summary>
+        /// The GetReadableStreamAsync.
+        /// </summary>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="startPoint">The startPoint<see cref="long"/>.</param>
+        /// <param name="endPoint">The endPoint<see cref="long"/>.</param>
+        /// <returns>The <see cref="Task{Stream}"/>.</returns>
+        Task<Stream> GetReadableStreamAsync(IHttpContext httpContext, long startPoint, long? endPoint);
+    }
+
+    /// <summary>
     /// Defines the <see cref="IStoreCollection" />.
     /// </summary>
     public interface IStoreCollection : IStoreItem
     {
-        // Get specific item (or all items)
         /// <summary>
         /// The GetItemAsync.
         /// </summary>
@@ -219,7 +244,6 @@ namespace NWebDav.Server.Stores
         /// <returns>The <see cref="Task{IEnumerable{IStoreItem}}"/>.</returns>
         Task<IEnumerable<IStoreItem>> GetItemsAsync(IHttpContext httpContext);
 
-        // Create items and collections and add to the collection
         /// <summary>
         /// The CreateItemAsync.
         /// </summary>
@@ -238,7 +262,6 @@ namespace NWebDav.Server.Stores
         /// <returns>The <see cref="Task{StoreCollectionResult}"/>.</returns>
         Task<StoreCollectionResult> CreateCollectionAsync(string name, bool overwrite, IHttpContext httpContext);
 
-        // Checks if the collection can be moved directly to the destination
         /// <summary>
         /// The SupportsFastMove.
         /// </summary>
@@ -249,7 +272,6 @@ namespace NWebDav.Server.Stores
         /// <returns>The <see cref="bool"/>.</returns>
         bool SupportsFastMove(IStoreCollection destination, string destinationName, bool overwrite, IHttpContext httpContext);
 
-        // Move items between collections
         /// <summary>
         /// The MoveItemAsync.
         /// </summary>
@@ -261,7 +283,6 @@ namespace NWebDav.Server.Stores
         /// <returns>The <see cref="Task{StoreItemResult}"/>.</returns>
         Task<StoreItemResult> MoveItemAsync(string sourceName, IStoreCollection destination, string destinationName, bool overwrite, IHttpContext httpContext);
 
-        // Delete items from collection
         /// <summary>
         /// The DeleteItemAsync.
         /// </summary>

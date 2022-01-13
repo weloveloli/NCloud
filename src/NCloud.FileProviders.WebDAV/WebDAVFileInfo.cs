@@ -13,6 +13,7 @@ namespace NCloud.FileProviders.WebDAV
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Logging;
     using NCloud.FileProviders.Abstractions;
+    using NCloud.FileProviders.Support.Logger;
     using NCloud.Utils;
     using WebDAVClient;
     using WebDAVClient.Model;
@@ -35,7 +36,7 @@ namespace NCloud.FileProviders.WebDAV
         /// <summary>
         /// Defines the logger.
         /// </summary>
-        private readonly ILogger<WebDAVFileProvider> logger;
+        private readonly ILogger<WebDAVFileInfo> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebDAVFileInfo"/> class.
@@ -43,11 +44,11 @@ namespace NCloud.FileProviders.WebDAV
         /// <param name="item">The item<see cref="Item"/>.</param>
         /// <param name="webDAVClient">The webDAVClient<see cref="IClient"/>.</param>
         /// <param name="logger">The logger<see cref="ILogger{WebDAVFileProvider}"/>.</param>
-        public WebDAVFileInfo(Item item, IClient webDAVClient, ILogger<WebDAVFileProvider> logger)
+        public WebDAVFileInfo(Item item, IClient webDAVClient)
         {
             this.item = item;
             this.client = webDAVClient;
-            this.logger = logger;
+            this.logger = ApplicationLogging.CreateLogger<WebDAVFileInfo>();
         }
 
         /// <summary>
@@ -92,7 +93,7 @@ namespace NCloud.FileProviders.WebDAV
         public Stream CreateReadStream()
         {
             this.logger.LogDebug("CreateReadStream for {name}", item.DisplayName);
-            return new WebDAVStream(item, client, logger);
+            return new WebDAVStream(item, client);
         }
 
         /// <summary>
@@ -115,7 +116,7 @@ namespace NCloud.FileProviders.WebDAV
         public Task<Stream> CreateReadStreamAsync(CancellationToken cancellationToken = default)
         {
             this.logger.LogDebug("CreateReadStreamAsync for {name}", item.DisplayName);
-            return Task.FromResult<Stream>(new WebDAVStream(item, client, logger));
+            return Task.FromResult<Stream>(new WebDAVStream(item, client));
         }
 
         /// <summary>

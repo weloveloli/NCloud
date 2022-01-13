@@ -9,7 +9,9 @@ namespace NCloud.FileProviders.AliyunDrive
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Microsoft.Extensions.Caching.Memory;
+    using Microsoft.Extensions.Logging;
     using NCloud.FileProviders.AliyunDrive.AliyunDriveAPI;
     using NCloud.FileProviders.AliyunDrive.AliyunDriveAPI.Models;
     using NCloud.FileProviders.AliyunDrive.AliyunDriveAPI.Models.Request;
@@ -24,6 +26,11 @@ namespace NCloud.FileProviders.AliyunDrive
         /// Defines the config.
         /// </summary>
         private readonly AliyunDriveConfig config;
+
+        /// <summary>
+        /// Defines the logger.
+        /// </summary>
+        private readonly ILogger<AliyunDriveClient> logger;
 
         /// <summary>
         /// Defines the configFolder.
@@ -44,9 +51,21 @@ namespace NCloud.FileProviders.AliyunDrive
         /// Defines the rootFileId.
         /// </summary>
         private readonly string rootFileId;
+
+        /// <summary>
+        /// Defines the idCacheOption.
+        /// </summary>
         private readonly MemoryCacheEntryOptions idCacheOption;
+
+        /// <summary>
+        /// Defines the itemCacheOption.
+        /// </summary>
         private readonly MemoryCacheEntryOptions itemCacheOption;
 
+        /// <summary>
+        /// Defines the itemCacheOption.
+        /// </summary>
+        private readonly MemoryCacheEntryOptions downloadUrlCacheOption;
         /// <summary>
         /// Defines the client.
         /// </summary>
@@ -56,11 +75,13 @@ namespace NCloud.FileProviders.AliyunDrive
         /// Initializes a new instance of the <see cref="AliyunDriveClient"/> class.
         /// </summary>
         /// <param name="config">The config<see cref="AliyunDriveConfig"/>.</param>
+        /// <param name="logger">The logger<see cref="ILogger{AliyunDriveClient}"/>.</param>
         /// <param name="configFolder">The configFolder<see cref="string"/>.</param>
         /// <param name="cache">The cache<see cref="IMemoryCache"/>.</param>
-        public AliyunDriveClient(AliyunDriveConfig config, string configFolder, IMemoryCache cache)
+        public AliyunDriveClient(AliyunDriveConfig config, ILogger<AliyunDriveClient> logger, string configFolder, IMemoryCache cache)
         {
             this.config = config;
+            this.logger = logger;
             this.configFolder = configFolder;
             this.cache = cache;
             var token = config.GetRefreshToken(configFolder);
@@ -72,17 +93,22 @@ namespace NCloud.FileProviders.AliyunDrive
             defaultDriveId = res.DefaultDriveId;
             rootFileId = "root";
             this.idCacheOption = new MemoryCacheEntryOptions()
-                            .SetSize(128)
+                            .SetSize(1)
                             .SetPriority(CacheItemPriority.High)
                             // Remove from cache after this time, regardless of sliding expiration
-                            .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+                            .SetAbsoluteExpiration(TimeSpan.FromHours(24));
 
             this.itemCacheOption = new MemoryCacheEntryOptions()
-                .SetSize(128)
-                .SetPriority(CacheItemPriority.High)
+                .SetSize(1)
+                .SetPriority(CacheItemPriority.Normal)
                 // Remove from cache after this time, regardless of sliding expiration
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
+                .SetAbsoluteExpiration(TimeSpan.FromHours(12));
 
+            this.downloadUrlCacheOption = new MemoryCacheEntryOptions()
+                .SetSize(1)
+                .SetPriority(CacheItemPriority.Normal)
+                // Remove from cache after this time, regardless of sliding expiration
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
         }
 
         /// <summary>
@@ -92,6 +118,7 @@ namespace NCloud.FileProviders.AliyunDrive
         /// <returns>The <see cref="FileItem"/>.</returns>
         public FileItem GetFileItemByPath(string path = "/")
         {
+            logger.LogDebug("GetFileItemByPath :{path}", path);
             var fileId = GetFileIdByPath(path);
             if (string.IsNullOrEmpty(fileId))
             {
@@ -101,8 +128,10 @@ namespace NCloud.FileProviders.AliyunDrive
             var item = cache.Get<FileItem>("GetFileItemByPath:" + fileId);
             if (item != null)
             {
+                logger.LogDebug("GetFileItemByPath with cache :{path}", path);
                 return item;
             }
+            logger.LogWarning("GetFileItemByPath miss cache :{path}", path);
             item = this.client.FileGetAsync(defaultDriveId, fileId).Result;
             if (item != null)
             {
@@ -118,6 +147,7 @@ namespace NCloud.FileProviders.AliyunDrive
         /// <returns>The <see cref="string"/>.</returns>
         public string GetFileIdByPath(string path)
         {
+            logger.LogDebug("GetFileIdByPath :{path}", path);
             if (path == "/")
             {
                 return rootFileId;
@@ -129,8 +159,10 @@ namespace NCloud.FileProviders.AliyunDrive
             var fileId = cache.Get<string>("FileIdByPath:" + path);
             if (!string.IsNullOrEmpty(fileId))
             {
+                logger.LogDebug("GetFileIdByPath with cache :{path}", path);
                 return fileId;
             }
+            logger.LogWarning("GetFileIdByPath without cache :{path}", path);
             var index = path.LastIndexOf("/");
             var parentPath = path.Substring(0, index);
             var name = path.Substring(index + 1);
@@ -138,6 +170,7 @@ namespace NCloud.FileProviders.AliyunDrive
             var item = items.Where(e => e.Name == name).FirstOrDefault();
             if (item != null)
             {
+                logger.LogDebug("GetFileIdByPath set cache :{path}", path);
                 cache.Set("FileIdByPath:" + path, item.FileId, idCacheOption);
             }
             return item?.FileId ?? string.Empty;
@@ -150,6 +183,7 @@ namespace NCloud.FileProviders.AliyunDrive
         /// <returns>The <see cref="FileItem[]"/>.</returns>
         public IEnumerable<FileItem> GetFileItemsByPath(string path = "/")
         {
+            logger.LogDebug("GetFileItemsByPath :{path}", path);
             if (string.IsNullOrEmpty(path))
             {
                 path = "/";
@@ -162,8 +196,10 @@ namespace NCloud.FileProviders.AliyunDrive
             var listRes = cache.Get<FileListResponse>("GetFileItemsByPath:" + fileId);
             if (listRes != null)
             {
+                logger.LogDebug("GetFileItemsByPath with cache:{path}", path);
                 return listRes.Items;
             }
+            logger.LogWarning("GetFileItemsByPath without cache:{path}", path);
             listRes = this.client.FileListAsync(new FileListRequest
             {
                 DriveId = defaultDriveId,
@@ -171,9 +207,30 @@ namespace NCloud.FileProviders.AliyunDrive
             }).Result;
             if (listRes != null)
             {
+                logger.LogDebug("GetFileItemsByPath set cache:{path}", path);
                 cache.Set("GetFileItemsByPath:" + fileId, listRes, itemCacheOption);
             }
             return listRes?.Items ?? Enumerable.Empty<FileItem>();
+        }
+
+        /// <summary>
+        /// The GetDownloadLinkAsync.
+        /// </summary>
+        /// <param name="fileId">The fileId<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task{string}"/>.</returns>
+        public async Task<DownloadUrlResponse> GetDownloadLinkAsync(string fileId)
+        {
+            logger.LogDebug("GetDownloadLinkAsync :{fileId}", fileId);
+            var res = cache.Get<DownloadUrlResponse>("GetDownloadLinkAsync:" + fileId);
+            if (res == null)
+            {
+                res = await this.client.GetDownloadUrlAsync(this.defaultDriveId, fileId);
+                if (res != null)
+                {
+                    cache.Set("GetDownloadLinkAsync:" + fileId, res, downloadUrlCacheOption);
+                }
+            }
+            return res;
         }
     }
 }
