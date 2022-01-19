@@ -40,9 +40,6 @@ namespace NWebDav.Server.Stores
             Item = item;
         }
 
-
-
-
         public static bool operator !=(StoreItemResult left, StoreItemResult right)
         {
             return !(left == right);
@@ -94,9 +91,6 @@ namespace NWebDav.Server.Stores
             Result = result;
             Collection = collection;
         }
-
-
-
 
         public static bool operator !=(StoreCollectionResult left, StoreCollectionResult right)
         {
@@ -167,6 +161,13 @@ namespace NWebDav.Server.Stores
         /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
         /// <returns>The <see cref="Task{Stream}"/>.</returns>
         Task<Stream> GetReadableStreamAsync(IHttpContext httpContext);
+
+        /// <summary>
+        /// ServeGetRequest 
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <returns></returns>
+        Task<bool> ServeGetRequest(IHttpContext httpContext);
 
         /// <summary>
         /// The UploadFromStreamAsync.

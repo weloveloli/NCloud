@@ -8,20 +8,26 @@ namespace NCloud.FileProviders.AliyunDrive
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Http.Extensions;
+    using Microsoft.AspNetCore.Http.Headers;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Primitives;
     using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.AliyunDrive.AliyunDriveAPI.Models;
+    using NCloud.FileProviders.Support;
     using NCloud.FileProviders.Support.Logger;
     using NCloud.Utils;
 
     /// <summary>
     /// Defines the <see cref="AliyunDriveFileInfo" />.
     /// </summary>
-    public class AliyunDriveFileInfo : IExtendedFileInfo
+    public class AliyunDriveFileInfo : IExtendedFileInfo, IWebDAVGetHandler
     {
         /// <summary>
         /// Defines the item.
@@ -52,7 +58,7 @@ namespace NCloud.FileProviders.AliyunDrive
             this.httpClient = httpClient;
             this.logger = ApplicationLogging.CreateLogger<AliyunDriveFileInfo>();
         }
-
+        private const int DefaultBufferSize = 4096;
         /// <summary>
         /// Gets the ETag.
         /// </summary>
@@ -154,5 +160,72 @@ namespace NCloud.FileProviders.AliyunDrive
             res.EnsureSuccessStatusCode();
             return await res.Content.ReadAsStreamAsync();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <returns></returns>
+        public async Task<bool> HandleWebDAVGetRequest(HttpContext httpContext)
+        {
+            if(httpContext == null)
+            {
+                return false;
+            }
+            var request = httpContext.Request;
+            var response = httpContext.Response;
+            if(request.Method == "HEAD")
+            {
+                response.StatusCode = StatusCodes.Status200OK;
+                response.ContentType = this.DetermineContentType();
+                response.Headers["ETag"] = this.CalculateEtag();
+                response.Headers["Transfer-Encoding"] = "chunked";
+                response.ContentLength = this.Length;
+                response.Headers["Last-Modified"] = this.LastModified.ToString();
+                return true;
+            }
+            else
+            {
+                var length = this.Length;
+                var downRes = this.client.GetDownloadLinkAsync(item.FileId).Result;
+                var req = new HttpRequestMessage { RequestUri = new Uri(downRes.Url) };
+                req.Headers.Add("referer", "https://www.aliyundrive.com/");
+                if (request.Headers.ContainsKey("range") || request.Headers.ContainsKey("Range"))
+                {
+                    var rangeValue = request.Headers["range"];
+                    if(rangeValue == StringValues.Empty) {
+                        rangeValue = request.Headers["Range"];
+                    }
+                    var range = rangeValue.ToString();
+                    var split = range.Split("-");
+                    if (split.Length == 2)
+                    {
+                        var end = split[1];
+                        if (long.Parse(end) >= Length)
+                        {
+                            range = range.Substring(0, range.LastIndexOf('-'));
+                        }
+                    }
+                    req.Headers.Add("range", range);
+                }
+                if (request.Headers.ContainsKey("if-range"))
+                {
+                    req.Headers.Add("if-range", request.Headers["if-range"].ToString());
+                }
+                var res = await httpClient.SendAsync(req);
+
+                foreach (var header in res.Headers)
+                {
+                    response.Headers[header.Key] = header.Value.First();
+                }
+                response.ContentType = this.DetermineContentType();
+                response.StatusCode = (int)res.StatusCode;
+                response.ContentLength = this.Length;
+                var steam = await res.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                await StreamCopyOperation.CopyToAsync(steam, response.Body, steam.Length, httpContext.RequestAborted).ConfigureAwait(false);
+                //await res.Content.CopyToAsync(response.Body, httpContext.RequestAborted).ConfigureAwait(false);
+                return true;
+            }
+        }     
     }
 }

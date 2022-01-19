@@ -14,4 +14,8 @@
     <IsPackable>true</IsPackable>
     <DefineConstants>$(DefineConstants);USE_ASYNC_READ</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NCloud.FileProviders.Abstractions\NCloud.FileProviders.Abstractions.csproj" />
+  </ItemGroup>
 </Project>

@@ -234,7 +234,7 @@ namespace NCloud.FileProviders.Support.Streams
         /// <returns>The byte range actually downloaded. It may be larger than the requested range.</returns>
         protected override async Task<int> LoadAsync(Stream stream, int offset, int length, CancellationToken cancellationToken)
         {
-            logger?.LogDebug("Load Async offset:{} length:{}", offset, length);
+            logger?.LogDebug("Load Async from url {} offset:{} length:{}", _uri, offset, length);
             if (length == 0)
             {
                 return 0;

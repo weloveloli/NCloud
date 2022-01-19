@@ -45,7 +45,9 @@ namespace NWebDav.Server
         {
             // Obtain the dispatcher
             if (!s_requestHandlers.TryGetValue(httpContext.Request.HttpMethod, out var requestHandler))
+            {
                 return null;
+            }
 
             // Create an instance of the request handler
             return requestHandler;

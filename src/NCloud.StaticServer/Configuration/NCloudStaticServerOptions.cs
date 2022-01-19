@@ -33,11 +33,6 @@ namespace NCloud.StaticServer.Configuration
         public WebDAVConfig WebDAVConfig { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether WebDAVEnable.
-        /// </summary>
-        public bool WebDAVEnable { get; set; }
-
-        /// <summary>
         /// Defines the _configFolder.
         /// </summary>
         private string _configFolder;
@@ -61,7 +56,7 @@ namespace NCloud.StaticServer.Configuration
                 {
                     return _configFolder;
                 }
-                _configFolder = Path.Combine(Environment.CurrentDirectory, "config");
+                _configFolder = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "config");
                 if (!Directory.Exists(_configFolder))
                 {
                     Directory.CreateDirectory(_configFolder);
@@ -86,7 +81,7 @@ namespace NCloud.StaticServer.Configuration
                 {
                     return _cacheFolder;
                 }
-                _cacheFolder = Path.Combine(Environment.CurrentDirectory, "cache");
+                _cacheFolder = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "cache");
                 if (!Directory.Exists(_cacheFolder))
                 {
                     Directory.CreateDirectory(_cacheFolder);

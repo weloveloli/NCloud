@@ -14,13 +14,9 @@ namespace NCloud.StaticServer
     using Microsoft.AspNetCore.StaticFiles;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using NCloud.EndPoints.FTP;
     using NCloud.EndPoints.Static;
-    using NCloud.EndPoints.WebDAV;
-    using NCloud.EndPoints.WebDAV.Extensions;
-    using NCloud.EndPoints.WebDAV.Logging;
     using NCloud.FileProviders.Abstractions;
     using NCloud.FileProviders.GitHub;
     using NCloud.FileProviders.Support;
@@ -50,13 +46,13 @@ namespace NCloud.StaticServer
         /// <summary>
         /// Defines the ncloud.
         /// </summary>
-        private NCloudStaticServerOptions ncloud;
+        protected NCloudStaticServerOptions ncloud;
 
         /// <summary>
         /// The ConfigureServices.
         /// </summary>
         /// <param name="services">The services<see cref="IServiceCollection"/>.</param>
-        public void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services)
         {
             this.ncloud = Configuration.GetSection("NCloud").Get<NCloudStaticServerOptions>();
             services.AddHttpClient();
@@ -76,10 +72,6 @@ namespace NCloud.StaticServer
             {
                 services.AddNCloudFtpServer<INCloudFileProviderRegistry>(ncloud.Ftp).AddHostedService<NCloudHostedFtpService>();
             }
-            if (ncloud.WebDAVEnable)
-            {
-                services.AddNCloudWebDAVServer(ncloud.WebDAVConfig).AddHostedService<NCloudHostedWebDAVServer>();
-            }
         }
 
         /// <summary>
@@ -87,25 +79,9 @@ namespace NCloud.StaticServer
         /// </summary>
         /// <param name="app">The app<see cref="IApplicationBuilder"/>.</param>
         /// <param name="env">The env<see cref="IWebHostEnvironment"/>.</param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             ApplicationLogging.LoggerFactory = loggerFactory;
-            if (ncloud.WebDAVEnable)
-            {
-                NWebDav.Server.Logging.LoggerFactory.Factory = new WebDavLoggerFactory();
-            }
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
             var service = app.ApplicationServices;
             var logger = service.GetService<ILogger<Startup>>();
             var fileProvider = service.GetService<INCloudFileProviderFactory>();
@@ -134,21 +110,6 @@ namespace NCloud.StaticServer
                     }
                 }
             }
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = dynamicFileProvider,
-                RequestPath = "",
-                DefaultContentType = "application/octet-stream",
-                ServeUnknownFileTypes = false,
-                ContentTypeProvider = service.GetService<IContentTypeProvider>()
-            });
-
-            app.UseDirectoryBrowser(new DirectoryBrowserOptions
-            {
-                FileProvider = dynamicFileProvider,
-                RequestPath = ""
-            });
         }
     }
 }

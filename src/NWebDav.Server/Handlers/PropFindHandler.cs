@@ -174,18 +174,24 @@ namespace NWebDav.Server.Handlers
                         if ((propertyMode & PropertyMode.AllProperties) != 0)
                         {
                             foreach (var propertyName in propertyManager.Properties.Where(p => !p.IsExpensive).Select(p => p.Name))
+                            {
                                 await AddPropertyAsync(httpContext, xResponse, xPropStatValues, propertyManager, entry.Entry, propertyName, addedProperties).ConfigureAwait(false);
+                            }
                         }
 
                         if ((propertyMode & PropertyMode.SelectedProperties) != 0)
                         {
                             foreach (var propertyName in propertyList)
+                            {
                                 await AddPropertyAsync(httpContext, xResponse, xPropStatValues, propertyManager, entry.Entry, propertyName, addedProperties).ConfigureAwait(false);
+                            }
                         }
 
                         // Add the values (if any)
                         if (xPropStatValues.HasElements)
+                        {
                             xResponse.Add(xPropStatValues);
+                        }
                     }
                 }
 
@@ -226,7 +232,9 @@ namespace NWebDav.Server.Handlers
                     {
                         var value = await propertyManager.GetPropertyAsync(httpContext, item, propertyName).ConfigureAwait(false);
                         if (value is IEnumerable<XElement>)
+                        {
                             value = ((IEnumerable<XElement>)value).Cast<object>().ToArray();
+                        }
 
                         // Make sure we use the same 'prop' tag to add all properties
                         var xProp = xPropStatValues.Element(WebDavNamespaces.DavNs + "prop");
@@ -269,7 +277,9 @@ namespace NWebDav.Server.Handlers
             // Create an XML document from the stream
             var xDocument = await request.LoadXmlDocumentAsync().ConfigureAwait(false);
             if (xDocument == null || xDocument?.Root == null || xDocument.Root.Name != WebDavNamespaces.DavNs + "propfind")
+            {
                 return PropertyMode.AllProperties;
+            }
 
             // Obtain the propfind node
             var xPropFind = xDocument.Root;
@@ -277,7 +287,9 @@ namespace NWebDav.Server.Handlers
             // If there is no child-node, then return all properties
             var xProps = xPropFind.Elements();
             if (!xProps.Any())
+            {
                 return PropertyMode.AllProperties;
+            }
 
             // Add all entries to the list
             var propertyMode = PropertyMode.None;
@@ -299,7 +311,9 @@ namespace NWebDav.Server.Handlers
 
                     // Include all specified properties
                     foreach (var xSubProp in xProp.Elements())
+                    {
                         properties.Add(xSubProp.Name);
+                    }
                 }
                 else
                 {
@@ -307,7 +321,9 @@ namespace NWebDav.Server.Handlers
 
                     // Include all specified properties
                     foreach (var xSubProp in xProp.Elements())
+                    {
                         properties.Add(xSubProp.Name);
+                    }
                 }
             }
 
@@ -331,14 +347,22 @@ namespace NWebDav.Server.Handlers
             // If we have enough depth, then add the children
             if (depth > 0)
             {
+                if(depth == 1)
+                {
+
+                }
                 // Add all child collections
                 foreach (var childEntry in await collection.GetItemsAsync(httpContext).ConfigureAwait(false))
                 {
                     var subUri = UriHelper.Combine(uri, childEntry.Name);
                     if (childEntry is IStoreCollection subCollection)
+                    {
                         await AddEntriesAsync(subCollection, depth - 1, httpContext, subUri, entries).ConfigureAwait(false);
+                    }
                     else
+                    {
                         entries.Add(new PropertyEntry(subUri, childEntry));
+                    }
                 }
             }
         }
