@@ -290,11 +290,42 @@ namespace NCloud.FileProviders.Support
             }
             if (fileInfo is FileInfoDecorator decorator)
             {
-                return CalculateEtag(decorator);
+                return CalculateEtag(decorator.InnerIFileInfo);
             }
             using var stream = fileInfo.CreateReadStream();
             var hash = SHA256.Create().ComputeHash(stream);
             return BitConverter.ToString(hash).Replace("-", string.Empty);
+        }
+
+        public static bool SupportCustomHandleringWebDavGetRequest(this IFileInfo fileInfo)
+        {
+            Check.NotNull(fileInfo, nameof(fileInfo));
+
+            if (fileInfo is IWebDAVGetHandler extendedFileInfo)
+            {
+                return true;
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return SupportCustomHandleringWebDavGetRequest(decorator.InnerIFileInfo);
+            }
+            return false;
+        }
+
+
+        public static Task<bool> CustomHandleringWebDavGetRequest(this IFileInfo fileInfo, Microsoft.AspNetCore.Http.HttpContext ctx)
+        {
+            Check.NotNull(fileInfo, nameof(fileInfo));
+
+            if (fileInfo is IWebDAVGetHandler webDAVGetHandler)
+            {
+                return webDAVGetHandler.HandleWebDAVGetRequest(ctx);
+            }
+            if (fileInfo is FileInfoDecorator decorator)
+            {
+                return CustomHandleringWebDavGetRequest(decorator.InnerIFileInfo, ctx);
+            }
+            return Task.FromResult(true);
         }
     }
 }

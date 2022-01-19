@@ -7,6 +7,9 @@
 namespace NWebDav.Server.Http
 {
     using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.FileProviders;
 
     /// <summary>
     /// HTTP response message interface.
@@ -34,5 +37,8 @@ namespace NWebDav.Server.Http
         /// Gets the stream that represents the response body..
         /// </summary>
         Stream Stream { get; }
+
+
+        Task SendFileAsync(Stream stream, long offset, long? count, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

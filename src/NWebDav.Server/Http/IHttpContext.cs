@@ -33,5 +33,8 @@ namespace NWebDav.Server.Http
         /// </summary>
         /// <returns>The <see cref="Task"/>.</returns>
         Task CloseAsync();
+
+
+        
     }
 }

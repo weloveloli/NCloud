@@ -6,7 +6,9 @@
 
 namespace NCloud.StaticServer
 {
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Hosting;
 
     /// <summary>
@@ -18,9 +20,15 @@ namespace NCloud.StaticServer
         /// The Main.
         /// </summary>
         /// <param name="args">The args<see cref="string[]"/>.</param>
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+            var webdavHost = CreateWebDavHostBuilder(args).Build();
+
+            await Task.WhenAny(
+                host.RunAsync(),
+                webdavHost.RunAsync()
+            );
         }
 
         /// <summary>
@@ -32,7 +40,18 @@ namespace NCloud.StaticServer
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<StaticStartup>();
                 });
+
+        public static IHostBuilder CreateWebDavHostBuilder(string[] args)
+        {
+            var host = Host.CreateDefaultBuilder(args);
+            host.ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseUrls("http://*:11111").UseStartup<WebDAVStartup>();
+            });
+
+            return host;
+        }
     }
 }

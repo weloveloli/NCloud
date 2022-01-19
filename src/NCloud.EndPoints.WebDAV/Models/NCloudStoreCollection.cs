@@ -9,13 +9,13 @@ namespace NCloud.EndPoints.WebDAV.Models
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Threading.Tasks;
     using System.Xml.Linq;
     using Microsoft.Extensions.FileProviders;
     using NCloud.FileProviders.Abstractions;
-    using NCloud.FileProviders.Support;
+    using NCloud.Utils;
     using NWebDav.Server;
+    using NWebDav.Server.Helpers;
     using NWebDav.Server.Http;
     using NWebDav.Server.Locking;
     using NWebDav.Server.Logging;
@@ -45,7 +45,7 @@ namespace NCloud.EndPoints.WebDAV.Models
         /// <summary>
         /// Defines the contents.
         /// </summary>
-        private readonly IDirectoryContents contents;
+        private readonly IFileInfo fileInfo;
 
         /// <summary>
         /// Defines the iNCloudFileProvider.
@@ -65,11 +65,11 @@ namespace NCloud.EndPoints.WebDAV.Models
         /// <param name="contents">The contents<see cref="IDirectoryContents"/>.</param>
         /// <param name="name">The name<see cref="string"/>.</param>
         /// <param name="iNCloudFileProvider">The iNCloudFileProvider<see cref="INCloudFileProvider"/>.</param>
-        public NCloudStoreCollection(ILockingManager lockingManager, string fullPath, IDirectoryContents contents, string name, INCloudFileProvider iNCloudFileProvider)
+        public NCloudStoreCollection(ILockingManager lockingManager, string fullPath, IFileInfo fileInfo, string name, INCloudFileProvider iNCloudFileProvider)
         {
             this.LockingManager = lockingManager;
             this.fullPath = fullPath;
-            this.contents = contents;
+            this.fileInfo = fileInfo;
             this.iNCloudFileProvider = iNCloudFileProvider;
             this.Name = name;
         }
@@ -120,10 +120,6 @@ namespace NCloud.EndPoints.WebDAV.Models
             new DavSupportedLockDefault<NCloudStoreCollection>(),
 
             // Hopmann/Lippert collection properties
-            new DavExtCollectionChildCount<NCloudStoreCollection>
-            {
-                Getter = (context, collection) => Enumerable.Count(collection.contents)
-            },
             new DavExtCollectionIsFolder<NCloudStoreCollection>
             {
                 Getter = (context, collection) => true
@@ -136,59 +132,13 @@ namespace NCloud.EndPoints.WebDAV.Models
             {
                 Getter = (context, collection) => false
             },
-            new DavExtCollectionHasSubs<NCloudStoreCollection>
-            {
-                Getter = (context, collection) => collection.contents.Any(e=>e.IsDirectory)
-            },
             new DavExtCollectionNoSubs<NCloudStoreCollection>
             {
                 Getter = (context, collection) => false
             },
-            new DavExtCollectionObjectCount<NCloudStoreCollection>
-            {
-                Getter = (context, collection) => collection.contents.Where(e=>!e.IsDirectory).Count()
-            },
             new DavExtCollectionReserved<NCloudStoreCollection>
             {
                 Getter = (context, collection) => true
-            },
-            new DavExtCollectionVisibleCount<NCloudStoreCollection>
-            {
-                Getter = (context, collection) => collection.contents.Count()
-            },
-
-            // Win32 extensions
-            new Win32CreationTime<NCloudStoreCollection>
-            {
-                Getter = (context, collection) => DateTime.UtcNow,
-                Setter = (context, collection, value) =>
-                {
-                    return DavStatusCode.Ok;
-                }
-            },
-            new Win32LastAccessTime<NCloudStoreCollection>
-            {
-                Getter = (context, collection) => DateTime.UtcNow,
-                Setter = (context, collection, value) =>
-                {
-                    return DavStatusCode.Ok;
-                }
-            },
-            new Win32LastModifiedTime<NCloudStoreCollection>
-            {
-                Getter = (context, collection) =>  DateTime.UtcNow,
-                Setter = (context, collection, value) =>
-                {
-                    return DavStatusCode.Ok;
-                }
-            },
-            new Win32FileAttributes<NCloudStoreCollection>
-            {
-                Getter = (context, collection) => FileAttributes.Directory,
-                Setter = (context, collection, value) =>
-                {
-                    return DavStatusCode.Ok;
-                }
             }
         });
 
@@ -267,8 +217,7 @@ namespace NCloud.EndPoints.WebDAV.Models
             }
             else if(item.IsDirectory && item.Exists)
             {
-                var contents = this.iNCloudFileProvider.GetDirectoryContents(fullPath);
-                return Task.FromResult<IStoreItem>(new NCloudStoreCollection(this.LockingManager, fullPath, contents, name, this.iNCloudFileProvider));
+                return Task.FromResult<IStoreItem>(new NCloudStoreCollection(this.LockingManager, fullPath, item, name, this.iNCloudFileProvider));
             }
             // Item not found
             return Task.FromResult<IStoreItem>(null);
@@ -283,14 +232,13 @@ namespace NCloud.EndPoints.WebDAV.Models
         {
             IEnumerable<IStoreItem> GetItemsInternal()
             {
+                var contents = iNCloudFileProvider.GetDirectoryContents(fullPath);
                 // Add all directories
                 foreach (var item in contents)
                 {
                     if(item.Exists && item.IsDirectory)
                     {
-                        var path = item.GetVirtualOrPhysicalPath();
-                        var content = this.iNCloudFileProvider.GetDirectoryContents(path);
-                        yield return new NCloudStoreCollection(LockingManager, path, content, Path.GetFileName(path),iNCloudFileProvider);
+                        yield return new NCloudStoreCollection(LockingManager, fullPath.EnsureEndsWith('/') + item.Name, item, item.Name, iNCloudFileProvider);
                     }
                     if (item.Exists && !item.IsDirectory)
                     {
@@ -349,6 +297,12 @@ namespace NCloud.EndPoints.WebDAV.Models
         public Task<DavStatusCode> UploadFromStreamAsync(IHttpContext httpContext, Stream source)
         {
             return Task.FromResult(DavStatusCode.Conflict);
+        }
+
+        public Task<bool> ServeGetRequest(IHttpContext httpContext)
+        {
+            httpContext.Response.SetStatus(DavStatusCode.PreconditionFailed);
+            return Task.FromResult(true);
         }
     }
 }

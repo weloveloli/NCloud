@@ -7,11 +7,14 @@
 namespace NCloud.EndPoints.WebDAV.Models
 {
     using System;
+    using System.Globalization;
     using System.IO;
     using System.Threading.Tasks;
     using Microsoft.Extensions.FileProviders;
     using NCloud.FileProviders.Support;
     using NWebDav.Server;
+    using NWebDav.Server.AspNetCore;
+    using NWebDav.Server.Helpers;
     using NWebDav.Server.Http;
     using NWebDav.Server.Locking;
     using NWebDav.Server.Props;
@@ -123,6 +126,152 @@ namespace NCloud.EndPoints.WebDAV.Models
             return this.fileInfo.Length;
         }
 
+        public async Task<bool> ServeGetRequest(IHttpContext httpContext)
+        {
+            if (httpContext is AspNetCoreContext coreContext && this.fileInfo.SupportCustomHandleringWebDavGetRequest())
+            {
+                return await this.fileInfo.CustomHandleringWebDavGetRequest(coreContext.HttpContext).ConfigureAwait(false);
+            }
+            var request = httpContext.Request;
+            var response = httpContext.Response;
+            // ETag might be used for a conditional request
+            string etag = null;
+
+            // Add non-expensive headers based on properties
+            var propertyManager = this.PropertyManager;
+            if (propertyManager != null)
+            {
+                // Add Last-Modified header
+                var lastModifiedUtc = (string)(await propertyManager.GetPropertyAsync(httpContext, this, DavGetLastModified<IStoreItem>.PropertyName, true).ConfigureAwait(false));
+                if (lastModifiedUtc != null)
+                {
+                    response.SetHeaderValue("Last-Modified", lastModifiedUtc);
+                }
+
+                // Add ETag
+                etag = (string)(await propertyManager.GetPropertyAsync(httpContext, this, DavGetEtag<IStoreItem>.PropertyName, true).ConfigureAwait(false));
+                if (etag != null)
+                {
+                    response.SetHeaderValue("Etag", etag);
+                }
+
+                // Add type
+                var contentType = (string)(await propertyManager.GetPropertyAsync(httpContext, this, DavGetContentType<IStoreItem>.PropertyName, true).ConfigureAwait(false));
+                if (contentType != null)
+                {
+                    response.SetHeaderValue("Content-Type", contentType);
+                }
+
+                // Add language
+                var contentLanguage = (string)(await propertyManager.GetPropertyAsync(httpContext, this, DavGetContentLanguage<IStoreItem>.PropertyName, true).ConfigureAwait(false));
+                if (contentLanguage != null)
+                {
+                    response.SetHeaderValue("Content-Language", contentLanguage);
+                }
+            }
+
+            await HandleStream(httpContext,  etag);
+            return true;
+        }
+
+        /// <summary>
+        /// The HandleStream.
+        /// </summary>
+        /// <param name="httpContext">The httpContext<see cref="IHttpContext"/>.</param>
+        /// <param name="entry">The entry<see cref="IStoreItem"/>.</param>
+        /// <param name="etag">The etag<see cref="string"/>.</param>
+        /// <returns>The <see cref="Task"/>.</returns>
+        private async Task HandleStream(IHttpContext httpContext, string etag)
+        {
+            // Obtain request and response
+            var request = httpContext.Request;
+            var response = httpContext.Response;
+            // Determine if we are invoked as HEAD
+            var head = request.HttpMethod == "HEAD";
+            // Determine the requested range
+            var range = request.GetRange();
+            long? streamLength = null;
+            // Stream the actual entry
+            using (var stream = await this.GetReadableStreamAsync(httpContext).ConfigureAwait(false))
+            {
+                if (stream != null && stream != Stream.Null)
+                {
+                    // Set the response
+                    response.SetStatus(DavStatusCode.Ok);
+
+                    // Set the expected content length
+                    try
+                    {
+                        // We can only specify the Content-Length header if the
+                        // length is known (this is typically true for seekable streams)
+                        if (stream.CanSeek)
+                        {
+                            // Add a header that we accept ranges (bytes only)
+                            response.SetHeaderValue("Accept-Ranges", "bytes");
+                            //response.SetHeaderValue("Transfer-Encoding", "chunked");
+
+                            // Determine the total length
+                            var length = stream.Length;
+
+                            // Check if an 'If-Range' was specified
+                            if (range?.If != null && this.PropertyManager != null)
+                            {
+                                var lastModifiedText = (string)await this.PropertyManager.GetPropertyAsync(httpContext, this, DavGetLastModified<IStoreItem>.PropertyName, true).ConfigureAwait(false);
+                                var lastModified = DateTime.Parse(lastModifiedText, CultureInfo.InvariantCulture);
+                                if (lastModified != range.If)
+                                {
+                                    range = null;
+                                }
+                            }
+
+                            // Check if a range was specified
+                            if (range != null)
+                            {
+                                var start = range.Start ?? 0;
+                                var end = Math.Min(range.End ?? long.MaxValue, length - 1);
+                                length = end - start + 1;
+
+                                // Write the range
+                                response.SetHeaderValue("Content-Range", $"bytes {start}-{end} / {stream.Length}");
+
+                                // Set status to partial result if not all data can be sent
+                                if (length < stream.Length)
+                                {
+                                    response.SetStatus(DavStatusCode.PartialContent);
+                                }
+                            }
+
+                            // Set the header, so the client knows how much data is required
+                            response.SetHeaderValue("Content-Length", $"{length}");
+                            streamLength = length;
+                        }
+                    }
+                    catch (NotSupportedException)
+                    {
+                        // If the content length is not supported, then we just skip it
+                    }
+
+                    // Do not return the actual item data if ETag matches
+                    if (etag != null && request.GetHeaderValue("If-None-Match") == etag)
+                    {
+                        response.SetHeaderValue("Content-Length", "0");
+                        response.SetStatus(DavStatusCode.NotModified);
+                        return;
+                    }
+
+                    // HEAD method doesn't require the actual item data
+                    if (!head)
+                    {
+                        await response.SendFileAsync(stream, range?.Start ?? 0, streamLength);
+                    }
+                    else
+                    {
+                        // Set the response
+                        response.SetStatus(DavStatusCode.NoContent);
+                    }
+                }
+            }
+        }
         /// <summary>
         /// Gets the DefaultPropertyManager.
         /// </summary>
