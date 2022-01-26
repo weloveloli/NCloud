@@ -41,7 +41,7 @@ namespace NWebDav.Server
             // this header should have a fixed layout.
             // (see https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.38)
             var assemblyVersion = typeof(WebDavDispatcher).GetTypeInfo().Assembly.GetName().Version;
-            s_serverName = $"NWebDav/{assemblyVersion}";
+            s_serverName = $"NCloudWebDav/{assemblyVersion}";
         }
 
         /// <summary>
@@ -98,9 +98,9 @@ namespace NWebDav.Server
 
             // Determine the request log-string
             var logRequest = $"{request.HttpMethod}:{request.Url}:{request.RemoteEndPoint}";
-
+            var corrlationId = Guid.NewGuid().ToString();
             // Log the request
-            s_log.Log(LogLevel.Info, () => $"{logRequest} - Start processing");
+            s_log.Log(LogLevel.Info, () => $"{logRequest} - Start processing corrlationId={corrlationId}");
 
             try
             {
@@ -108,6 +108,7 @@ namespace NWebDav.Server
                 // functional use, but it can be used to diagnose problems by
                 // determining the actual WebDAV server and version.
                 response.SetHeaderValue("Server", s_serverName);
+                response.SetHeaderValue("x-correlation-id", corrlationId);
 
                 // Start the stopwatch
                 var sw = Stopwatch.StartNew();
@@ -132,7 +133,7 @@ namespace NWebDav.Server
                 catch (Exception exc)
                 {
                     // Log error
-                    s_log.Log(LogLevel.Error, () => $"Unexpected exception while trying to obtain the request handler (method={request.HttpMethod}, url={request.Url}, source={request.RemoteEndPoint}", exc);
+                    s_log.Log(LogLevel.Error, () => $"Unexpected exception while trying to obtain the request handler (method={request.HttpMethod}, url={request.Url}, source={request.RemoteEndPoint}, corrlationId={corrlationId}", exc);
 
                     // Abort
                     return;
@@ -144,7 +145,7 @@ namespace NWebDav.Server
                     if (await requestHandler.HandleRequestAsync(httpContext, _store).ConfigureAwait(false))
                     {
                         // Log processing duration
-                        s_log.Log(LogLevel.Info, () => $"{logRequest} - Finished processing ({sw.ElapsedMilliseconds}ms, HTTP result: {httpContext.Response.Status})");
+                        s_log.Log(LogLevel.Info, () => $"{logRequest} - Finished processing ({sw.ElapsedMilliseconds}ms, HTTP result: {httpContext.Response.Status}), corrlationId={corrlationId}");
                     }
                     else
                     {

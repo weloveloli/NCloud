@@ -38,7 +38,7 @@ namespace NCloud.FileProviders.AliyunDrive
         /// </summary>
         /// <param name="item">The item<see cref="FileItem"/>.</param>
         /// <param name="client">The client<see cref="AliyunDriveClient"/>.</param>
-        public AliyunDriveStream(FileItem item, AliyunDriveClient client) : base(null, new MemoryStream(), true, 1 << 16, null, null, null)
+        public AliyunDriveStream(FileItem item, AliyunDriveClient client) : base(null, new MemoryStream(), true, 1 << 18, null, null, null)
         {
             this.item = item;
             this.client = client;

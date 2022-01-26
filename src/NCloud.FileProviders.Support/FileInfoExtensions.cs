@@ -8,6 +8,7 @@ namespace NCloud.FileProviders.Support
 {
     using System;
     using System.IO;
+    using System.Net.Http.Headers;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading;
@@ -292,9 +293,8 @@ namespace NCloud.FileProviders.Support
             {
                 return CalculateEtag(decorator.InnerIFileInfo);
             }
-            using var stream = fileInfo.CreateReadStream();
-            var hash = SHA256.Create().ComputeHash(stream);
-            return BitConverter.ToString(hash).Replace("-", string.Empty);
+            long etagHash = fileInfo.LastModified.ToFileTime() ^ fileInfo.Length;
+            return new EntityTagHeaderValue('\"' + Convert.ToString(etagHash, 16) + '\"').ToString();
         }
 
         public static bool SupportCustomHandleringWebDavGetRequest(this IFileInfo fileInfo)

@@ -114,7 +114,7 @@ namespace NCloud.FileProviders.AliyunDrive.AliyunDriveAPI
         /// The IsTokenExpire.
         /// </summary>
         /// <returns>The <see cref="bool"/>.</returns>
-        private bool IsTokenExpire()
+        public bool IsTokenExpire()
             => _tokenExpireTime == null || _tokenExpireTime.Value > DateTime.UtcNow;
 
         /// <summary>

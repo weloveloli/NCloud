@@ -41,9 +41,8 @@ namespace NCloud.StaticServer
             {
                 // Create the proper HTTP context
                 var httpContext = new AspNetCoreContext(context);
-
                 // Dispatch request
-                await webDavDispatcher.DispatchRequestAsync(httpContext).ConfigureAwait(false);
+                await webDavDispatcher.DispatchRequestAsync(httpContext);
             });
         }
     }

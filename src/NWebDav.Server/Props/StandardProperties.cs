@@ -321,4 +321,24 @@ namespace NWebDav.Server.Props
         /// </summary>
         public override XName Name => PropertyName;
     }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TEntry"></typeparam>
+    public class DavExtCollectionQuotaAvailableBytes<TEntry> : DavInt64<TEntry> where TEntry : IStoreItem
+    {
+        public static readonly XName PropertyName = WebDavNamespaces.DavNs + "quota-available-bytes";
+
+        public override XName Name => PropertyName;
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TEntry"></typeparam>
+    public class DavExtCollectionQuotaUsedBytes<TEntry> : DavInt64<TEntry> where TEntry : IStoreItem
+    {
+        public static readonly XName PropertyName = WebDavNamespaces.DavNs + "quota-used-bytes";
+
+        public override XName Name => PropertyName;
+    }
 }

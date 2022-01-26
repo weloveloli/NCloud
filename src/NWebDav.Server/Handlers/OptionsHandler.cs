@@ -6,6 +6,8 @@
 
 namespace NWebDav.Server.Handlers
 {
+    using System;
+    using System.Globalization;
     using System.Threading.Tasks;
     using NWebDav.Server.Helpers;
     using NWebDav.Server.Http;
@@ -28,12 +30,12 @@ namespace NWebDav.Server.Handlers
             var response = httpContext.Response;
 
             // We're a DAV class 1 and 2 compatible server
-            response.SetHeaderValue("Dav", "1, 2");
+            response.SetHeaderValue("Dav", "1,2,3,sabredav-partialupdate");
             response.SetHeaderValue("MS-Author-Via", "DAV");
 
             // Set the Allow/Public headers
-            response.SetHeaderValue("Allow", string.Join(", ", RequestHandlerFactory.AllowedMethods));
-            response.SetHeaderValue("Public", string.Join(", ", RequestHandlerFactory.AllowedMethods));
+            response.SetHeaderValue("allow", "OPTIONS,PROPFIND,COPY,LOCK,UNLOCK");
+            response.SetHeaderValue("date", DateTime.Now.ToString("r", CultureInfo.GetCultureInfo("en-US")));
 
             // Finished
             response.SetStatus(DavStatusCode.Ok);

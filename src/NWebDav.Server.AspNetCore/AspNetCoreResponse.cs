@@ -29,7 +29,12 @@ namespace NWebDav.Server.AspNetCore
 
             public int Status {
                 get => _response.StatusCode;
-                set => _response.StatusCode = value;
+                set {
+                    if (!_response.HasStarted)
+                    {
+                        _response.StatusCode = value;
+                    }
+                }
             }
 
             // Status Description isn't send to the requester

@@ -186,7 +186,9 @@ namespace NWebDav.Server.Helpers
 
             // Strip the brackets from the header
             if (!lockTokenHeader.StartsWith("<") || !lockTokenHeader.EndsWith(">"))
+            {
                 return null;
+            }
 
             // Create an Uri of the intermediate part
             return new Uri(lockTokenHeader.Substring(1, lockTokenHeader.Length - 2), UriKind.Absolute);
@@ -206,7 +208,9 @@ namespace NWebDav.Server.Helpers
 
             // Strip the brackets from the header
             if (!lockTokenHeader.StartsWith("(<") || !lockTokenHeader.EndsWith(">)"))
+            {
                 return null;
+            }
 
             // Create an Uri of the intermediate part
             return new Uri(lockTokenHeader.Substring(2, lockTokenHeader.Length - 4), UriKind.Absolute);
@@ -281,7 +285,15 @@ namespace NWebDav.Server.Helpers
 
             // Obtain an XML document from the stream
 #if USE_ASYNC_READ
-            var xDocument = await XDocument.LoadAsync(request.Stream, LoadOptions.None, cancellationToken: default);
+            XDocument xDocument = null;
+            try
+            {
+                xDocument = await XDocument.LoadAsync(request.Stream, LoadOptions.None, cancellationToken: default);
+            }
+            catch (Exception)
+            {
+                xDocument = null;
+            }
 #else
             var xDocument = XDocument.Load(request.Stream);
 #endif
