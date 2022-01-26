@@ -98,9 +98,9 @@ namespace NCloud.EndPoints.WebDAV.Models
                     return DavStatusCode.Ok;
                 }
             },
-            new DavDisplayName<NCloudStoreCollection>
+            new DavGetContentType<NCloudStoreCollection>
             {
-                Getter = (context, collection) => collection.Name
+                Getter = (context, item) => "httpd/unix-directory"
             },
             new DavGetLastModified<NCloudStoreCollection>
             {
@@ -110,36 +110,23 @@ namespace NCloud.EndPoints.WebDAV.Models
                     return DavStatusCode.Ok;
                 }
             },
+            // Default locking property handling via the LockingManager
+            new DavLockDiscoveryDefault<NCloudStoreCollection>(),
             new DavGetResourceType<NCloudStoreCollection>
             {
                 Getter = (context, collection) => new []{s_xDavCollection}
             },
-
-            // Default locking property handling via the LockingManager
-            new DavLockDiscoveryDefault<NCloudStoreCollection>(),
             new DavSupportedLockDefault<NCloudStoreCollection>(),
-
-            // Hopmann/Lippert collection properties
-            new DavExtCollectionIsFolder<NCloudStoreCollection>
+            new DavExtCollectionQuotaAvailableBytes<NCloudStoreCollection>
             {
-                Getter = (context, collection) => true
+                IsExpensive = true,
+                Getter = (context, item) => 1L
             },
-            new DavExtCollectionIsHidden<NCloudStoreCollection>
+            new DavExtCollectionQuotaUsedBytes<NCloudStoreCollection>
             {
-                Getter = (context, collection) => false
+                IsExpensive = true,
+                Getter = (context, item) => 1L
             },
-            new DavExtCollectionIsStructuredDocument<NCloudStoreCollection>
-            {
-                Getter = (context, collection) => false
-            },
-            new DavExtCollectionNoSubs<NCloudStoreCollection>
-            {
-                Getter = (context, collection) => false
-            },
-            new DavExtCollectionReserved<NCloudStoreCollection>
-            {
-                Getter = (context, collection) => true
-            }
         });
 
         /// <summary>

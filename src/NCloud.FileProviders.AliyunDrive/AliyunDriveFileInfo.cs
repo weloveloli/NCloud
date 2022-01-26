@@ -7,6 +7,7 @@
 namespace NCloud.FileProviders.AliyunDrive
 {
     using System;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net.Http;
@@ -14,8 +15,6 @@ namespace NCloud.FileProviders.AliyunDrive
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Http.Extensions;
-    using Microsoft.AspNetCore.Http.Headers;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Primitives;
     using NCloud.FileProviders.Abstractions;
@@ -43,6 +42,10 @@ namespace NCloud.FileProviders.AliyunDrive
         /// Defines the httpClient.
         /// </summary>
         private readonly HttpClient httpClient;
+
+        /// <summary>
+        /// the logger
+        /// </summary>
         private readonly ILogger<AliyunDriveFileInfo> logger;
 
         /// <summary>
@@ -58,7 +61,6 @@ namespace NCloud.FileProviders.AliyunDrive
             this.httpClient = httpClient;
             this.logger = ApplicationLogging.CreateLogger<AliyunDriveFileInfo>();
         }
-        private const int DefaultBufferSize = 4096;
         /// <summary>
         /// Gets the ETag.
         /// </summary>
@@ -102,10 +104,6 @@ namespace NCloud.FileProviders.AliyunDrive
         /// <returns>The <see cref="Stream"/>.</returns>
         public Stream CreateReadStream(long startPosition, long? endPosition = null)
         {
-            //if(startPosition == 0 && !endPosition.HasValue)
-            //{
-            //    return CreateReadStream();
-            //}
             logger.LogDebug("CreateReadStream startPosition {startPosition}, endPosition {endPosition}", startPosition, endPosition);
             Check.CheckIndex(startPosition, endPosition, this.Length);
             var downRes = this.client.GetDownloadLinkAsync(item.FileId).Result;
@@ -147,10 +145,6 @@ namespace NCloud.FileProviders.AliyunDrive
         public async Task<Stream> CreateReadStreamAsync(long startPosition, long? endPosition = null, CancellationToken token = default)
         {
             logger.LogDebug("CreateReadStreamAsync startPosition {startPosition}, endPosition {endPosition}", startPosition, endPosition);
-            //if (startPosition == 0 && !endPosition.HasValue)
-            //{
-            //    return new AliyunDriveStream(item, client);
-            //}
             Check.CheckIndex(startPosition, endPosition, this.Length);
             var downRes = await this.client.GetDownloadLinkAsync(item.FileId);
             var request = new HttpRequestMessage { RequestUri = new Uri(downRes.Url) };
@@ -162,38 +156,44 @@ namespace NCloud.FileProviders.AliyunDrive
         }
 
         /// <summary>
-        /// 
+        /// HandleWebDAVGetRequest
         /// </summary>
-        /// <param name="httpContext"></param>
+        /// <param name="httpContext">http context</param>
         /// <returns></returns>
         public async Task<bool> HandleWebDAVGetRequest(HttpContext httpContext)
         {
-            if(httpContext == null)
+            if (httpContext == null)
             {
                 return false;
             }
             var request = httpContext.Request;
             var response = httpContext.Response;
-            if(request.Method == "HEAD")
+            var correlationId = response.Headers["x-correlation-id"].FirstOrDefault();
+            foreach (var header in request.Headers)
+            {
+                logger.LogDebug("[{correlationId}] Webdav head[{}]:[{}]", correlationId, header.Key,string.Join(',',header.Value));
+            }
+            if (request.Method == "HEAD")
             {
                 response.StatusCode = StatusCodes.Status200OK;
                 response.ContentType = this.DetermineContentType();
-                response.Headers["ETag"] = this.CalculateEtag();
-                response.Headers["Transfer-Encoding"] = "chunked";
+                response.Headers["etag"] = this.CalculateEtag();
                 response.ContentLength = this.Length;
-                response.Headers["Last-Modified"] = this.LastModified.ToString();
+                response.Headers["last-modified"] = this.LastModified.ToString("r", CultureInfo.GetCultureInfo("en-US"));
+                response.Headers["date"] = DateTime.Now.ToString("r", CultureInfo.GetCultureInfo("en-US"));
                 return true;
             }
             else
             {
-                var length = this.Length;
-                var downRes = this.client.GetDownloadLinkAsync(item.FileId).Result;
+                var downRes = await this.client.GetDownloadLinkAsync(item.FileId);
                 var req = new HttpRequestMessage { RequestUri = new Uri(downRes.Url) };
                 req.Headers.Add("referer", "https://www.aliyundrive.com/");
+            
                 if (request.Headers.ContainsKey("range") || request.Headers.ContainsKey("Range"))
                 {
                     var rangeValue = request.Headers["range"];
-                    if(rangeValue == StringValues.Empty) {
+                    if (rangeValue == StringValues.Empty)
+                    {
                         rangeValue = request.Headers["Range"];
                     }
                     var range = rangeValue.ToString();
@@ -212,20 +212,30 @@ namespace NCloud.FileProviders.AliyunDrive
                 {
                     req.Headers.Add("if-range", request.Headers["if-range"].ToString());
                 }
-                var res = await httpClient.SendAsync(req);
-
-                foreach (var header in res.Headers)
-                {
-                    response.Headers[header.Key] = header.Value.First();
-                }
-                response.ContentType = this.DetermineContentType();
+                var res = await httpClient.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
                 response.StatusCode = (int)res.StatusCode;
-                response.ContentLength = this.Length;
-                var steam = await res.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                await StreamCopyOperation.CopyToAsync(steam, response.Body, steam.Length, httpContext.RequestAborted).ConfigureAwait(false);
-                //await res.Content.CopyToAsync(response.Body, httpContext.RequestAborted).ConfigureAwait(false);
+                if(res.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    response.Headers["accept-ranges"] = "bytes";
+                    response.ContentLength = res.Content.Headers.ContentLength;
+                    response.Headers["etag"] = this.ETag;
+                    response.ContentType = res.Content.Headers.ContentType.ToString();
+                    response.Headers["last-modified"] = this.LastModified.ToString("r", CultureInfo.GetCultureInfo("en-US"));
+                    response.Headers["date"] = DateTime.Now.ToString("r", CultureInfo.GetCultureInfo("en-US"));
+                }
+                else if(res.StatusCode == System.Net.HttpStatusCode.PartialContent)
+                {                    
+                    response.Headers["accept-ranges"] = "bytes";
+                    response.Headers["etag"] = this.ETag;
+                    response.Headers["last-modified"] = this.LastModified.ToString("r", CultureInfo.GetCultureInfo("en-US"));
+                    response.Headers["date"] = DateTime.Now.ToString("r", CultureInfo.GetCultureInfo("en-US"));
+                    response.Headers["content-range"] = res.Content.Headers.ContentRange.ToString();
+                    response.ContentLength = res.Content.Headers.ContentLength;
+                    response.ContentType = res.Content.Headers.ContentType.ToString();
+                }
+                await res.Content.CopyToAsync(response.Body);
                 return true;
             }
-        }     
+        }
     }
 }

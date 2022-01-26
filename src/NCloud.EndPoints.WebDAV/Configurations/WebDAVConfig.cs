@@ -34,11 +34,11 @@ namespace NCloud.EndPoints.WebDAV.Configurations
         /// <summary>
         /// Gets or sets the UserName.
         /// </summary>
-        public string UserName { get; set; } = "test";
+        public string UserName { get; set; } = "admin";
 
         /// <summary>
         /// Gets or sets the Password.
         /// </summary>
-        public string Password { get; set; } = "test";
+        public string Password { get; set; } = "admin";
     }
 }

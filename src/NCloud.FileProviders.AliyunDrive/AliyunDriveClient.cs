@@ -96,13 +96,13 @@ namespace NCloud.FileProviders.AliyunDrive
                             .SetSize(1)
                             .SetPriority(CacheItemPriority.High)
                             // Remove from cache after this time, regardless of sliding expiration
-                            .SetAbsoluteExpiration(TimeSpan.FromHours(24));
+                            .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
 
             this.itemCacheOption = new MemoryCacheEntryOptions()
                 .SetSize(1)
                 .SetPriority(CacheItemPriority.Normal)
                 // Remove from cache after this time, regardless of sliding expiration
-                .SetAbsoluteExpiration(TimeSpan.FromHours(12));
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
 
             this.downloadUrlCacheOption = new MemoryCacheEntryOptions()
                 .SetSize(1)
@@ -131,7 +131,12 @@ namespace NCloud.FileProviders.AliyunDrive
                 logger.LogDebug("GetFileItemByPath with cache :{path}", path);
                 return item;
             }
-            logger.LogWarning("GetFileItemByPath miss cache :{path}", path);
+            logger.LogDebug("GetFileItemByPath miss cache :{path}", path);
+            if (client.IsTokenExpire())
+            {
+                client.RefreshTokenAsync().Wait();
+            }
+
             item = this.client.FileGetAsync(defaultDriveId, fileId).Result;
             if (item != null)
             {
@@ -162,10 +167,14 @@ namespace NCloud.FileProviders.AliyunDrive
                 logger.LogDebug("GetFileIdByPath with cache :{path}", path);
                 return fileId;
             }
-            logger.LogWarning("GetFileIdByPath without cache :{path}", path);
+            logger.LogDebug("GetFileIdByPath without cache :{path}", path);
             var index = path.LastIndexOf("/");
             var parentPath = path.Substring(0, index);
             var name = path.Substring(index + 1);
+            if (client.IsTokenExpire())
+            {
+                client.RefreshTokenAsync().Wait();
+            }
             var items = GetFileItemsByPath(parentPath);
             var item = items.Where(e => e.Name == name).FirstOrDefault();
             if (item != null)
@@ -199,7 +208,11 @@ namespace NCloud.FileProviders.AliyunDrive
                 logger.LogDebug("GetFileItemsByPath with cache:{path}", path);
                 return listRes.Items;
             }
-            logger.LogWarning("GetFileItemsByPath without cache:{path}", path);
+            logger.LogDebug("GetFileItemsByPath without cache:{path}", path);
+            if (client.IsTokenExpire())
+            {
+                client.RefreshTokenAsync().Wait();
+            }
             listRes = this.client.FileListAsync(new FileListRequest
             {
                 DriveId = defaultDriveId,
@@ -224,6 +237,10 @@ namespace NCloud.FileProviders.AliyunDrive
             var res = cache.Get<DownloadUrlResponse>("GetDownloadLinkAsync:" + fileId);
             if (res == null)
             {
+                if (client.IsTokenExpire())
+                {
+                    client.RefreshTokenAsync().Wait();
+                }
                 res = await this.client.GetDownloadUrlAsync(this.defaultDriveId, fileId);
                 if (res != null)
                 {

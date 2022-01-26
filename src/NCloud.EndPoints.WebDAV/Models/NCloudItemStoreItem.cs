@@ -286,10 +286,6 @@ namespace NCloud.EndPoints.WebDAV.Models
                     return DavStatusCode.Ok;
                 }
             },
-            new DavDisplayName<NCloudItemStoreItem>
-            {
-                Getter = (context, item) => item.fileInfo.Name
-            },
             new DavGetContentLength<NCloudItemStoreItem>
             {
                 Getter = (context, item) => item.fileInfo.Length
@@ -302,7 +298,7 @@ namespace NCloud.EndPoints.WebDAV.Models
             {
                 // Calculating the Etag is an expensive operation,
                 // because we need to scan the entire file.
-                IsExpensive = true,
+                IsExpensive = false,
                 Getter = (context, item) => item.fileInfo.CalculateEtag()
             },
             new DavGetLastModified<NCloudItemStoreItem>
@@ -320,48 +316,7 @@ namespace NCloud.EndPoints.WebDAV.Models
 
             // Default locking property handling via the LockingManager
             new DavLockDiscoveryDefault<NCloudItemStoreItem>(),
-            new DavSupportedLockDefault<NCloudItemStoreItem>(),
-
-            // Hopmann/Lippert collection properties
-            // (although not a collection, the IsHidden property might be valuable)
-            new DavExtCollectionIsHidden<NCloudItemStoreItem>
-            {
-                Getter = (context, item) => false
-            },
-
-            // Win32 extensions
-            new Win32CreationTime<NCloudItemStoreItem>
-            {
-                Getter = (context, item) => item.fileInfo.LastModified.UtcDateTime,
-                Setter = (context, item, value) =>
-                {
-                    return DavStatusCode.Ok;
-                }
-            },
-            new Win32LastAccessTime<NCloudItemStoreItem>
-            {
-                Getter = (context, item) => item.fileInfo.LastModified.UtcDateTime,
-                Setter = (context, item, value) =>
-                {
-                    return DavStatusCode.Ok;
-                }
-            },
-            new Win32LastModifiedTime<NCloudItemStoreItem>
-            {
-                Getter = (context, item) => item.fileInfo.LastModified.UtcDateTime,
-                Setter = (context, item, value) =>
-                {
-                    return DavStatusCode.Ok;
-                }
-            },
-            new Win32FileAttributes<NCloudItemStoreItem>
-            {
-                Getter = (context, item) => FileAttributes.ReadOnly,
-                Setter = (context, item, value) =>
-                {
-                    return DavStatusCode.Ok;
-                }
-            }
+            new DavSupportedLockDefault<NCloudItemStoreItem>()
         });
     }
 }

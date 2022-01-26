@@ -35,7 +35,7 @@ namespace NCloud.StaticServer
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             var service = app.ApplicationServices;
             var dynamicFileProvider = service.GetService<INCloudFileProviderRegistry>();
             app.UseStaticFiles(new StaticFileOptions
