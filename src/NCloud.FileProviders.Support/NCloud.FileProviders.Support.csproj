@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NCloud.Core\NCloud.Core.csproj" />
     <ProjectReference Include="..\NCloud.FileProviders.Abstractions\NCloud.FileProviders.Abstractions.csproj" />
   </ItemGroup>
 

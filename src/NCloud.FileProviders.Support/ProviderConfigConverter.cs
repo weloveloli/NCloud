@@ -30,12 +30,7 @@ namespace NCloud.FileProviders.Support
         /// </summary>
         public ProviderConfigConverter()
         {
-            var fileProviderAssemblies = new List<Assembly>();
-            string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            foreach (string dll in Directory.GetFiles(path, "NCloud.FileProviders.*.dll"))
-            {
-                fileProviderAssemblies.Add(Assembly.LoadFrom(dll));
-            }
+            var fileProviderAssemblies = Assembly.GetExecutingAssembly().GetProviderAssembly();
             var types = fileProviderAssemblies.SelectMany(e => e.GetExportedTypes())
                 .Where(e => typeof(INCloudFileProvider).IsAssignableFrom(e))
                 .Where(e => e.GetCustomAttributes(typeof(FileProviderAttribute), false).Length == 1);

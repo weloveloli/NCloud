@@ -55,12 +55,8 @@ namespace NCloud.FileProviders.Support
             this.logger = serviceProvider.GetService<ILogger<DefaultNCloudFileProviderFactory>>();
             this._providers = new Dictionary<string, INCloudFileProvider>();
             this._prefixs = new Dictionary<string, string>();
-            var fileProviderAssemblies = new List<Assembly>();
+            var fileProviderAssemblies = Assembly.GetExecutingAssembly().GetProviderAssembly();
             string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            foreach (string dll in Directory.GetFiles(path, "NCloud.FileProviders.*.dll"))
-            {
-                fileProviderAssemblies.Add(Assembly.LoadFrom(dll));
-            }
             var types = fileProviderAssemblies.SelectMany(e => e.GetExportedTypes())
                 .Where(e => typeof(INCloudFileProvider).IsAssignableFrom(e));
             this._providerTypes = types

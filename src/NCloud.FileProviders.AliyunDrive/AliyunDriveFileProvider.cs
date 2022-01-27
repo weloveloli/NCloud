@@ -62,6 +62,7 @@ namespace NCloud.FileProviders.AliyunDrive
             this.httpClient = (HttpClient)provider.GetService(typeof(HttpClient)) ?? new HttpClient();
             this.client = new AliyunDriveClient(config, clientLogger, systemConfigProvider.ConfigFolder, provider.GetService<IMemoryCache>());
             this.logger = provider.GetService<ILogger<AliyunDriveFileProvider>>();
+            AliyunRefreshTokenCronJob.AliyunDriveFileProviders.Add(this);
         }
 
         /// <summary>
@@ -115,6 +116,14 @@ namespace NCloud.FileProviders.AliyunDrive
             {
                 return ToFileInfo(item);
             }
+        }
+
+        /// <summary>
+        /// Refresh Token
+        /// </summary>
+        public void Refresh()
+        {
+            this.client.Refresh();
         }
     }
 }
