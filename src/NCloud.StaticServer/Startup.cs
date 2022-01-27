@@ -9,12 +9,15 @@ namespace NCloud.StaticServer
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+    using System.Reflection;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.StaticFiles;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
+    using NCloud.Core;
     using NCloud.EndPoints.FTP;
     using NCloud.EndPoints.Static;
     using NCloud.FileProviders.Abstractions;
@@ -67,6 +70,12 @@ namespace NCloud.StaticServer
             services.AddSingleton<INCloudFileProviderFactory, DefaultNCloudFileProviderFactory>();
             services.AddSingleton<IContentTypeProvider, MimeContentTypeProvider>();
             services.AddSingleton<ISystemConfigProvider>(ncloud);
+            var startUps = Assembly.GetExecutingAssembly().GetProviderAssembly().SelectMany(e => e.GetExportedTypes())
+                .Where(e => typeof(INCloudStartUp).IsAssignableFrom(e)).Select(t=>(INCloudStartUp)Activator.CreateInstance(t));
+            foreach (var startup in startUps)
+            {
+                startup.ConfigureServices(services);
+            }
             services.AddDirectoryBrowser();
             if (ncloud.FtpEnable)
             {

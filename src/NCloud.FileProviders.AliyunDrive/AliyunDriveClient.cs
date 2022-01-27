@@ -249,5 +249,10 @@ namespace NCloud.FileProviders.AliyunDrive
             }
             return res;
         }
+
+        public void Refresh()
+        {
+            this.client.RefreshTokenAsync().Wait();
+        }
     }
 }

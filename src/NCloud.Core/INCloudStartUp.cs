@@ -9,9 +9,9 @@ namespace NCloud.Core
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
-    /// Defines the <see cref="NCloudStartUp" />.
+    /// Defines the <see cref="INCloudStartUp" />.
     /// </summary>
-    public interface NCloudStartUp
+    public interface INCloudStartUp
     {
         /// <summary>
         /// The ConfigureServices.
