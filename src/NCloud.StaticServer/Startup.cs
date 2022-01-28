@@ -26,6 +26,7 @@ namespace NCloud.StaticServer
     using NCloud.FileProviders.Support.Logger;
     using NCloud.StaticServer.Configuration;
     using Newtonsoft.Json;
+    using Serilog;
 
     /// <summary>
     /// Defines the <see cref="Startup" />.
@@ -119,6 +120,8 @@ namespace NCloud.StaticServer
                     }
                 }
             }
+            // This will make the HTTP requests log as rich logs instead of plain text.
+            app.UseSerilogRequestLogging(); // <-- Add this line
         }
     }
 }

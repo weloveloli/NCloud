@@ -108,7 +108,7 @@ namespace NCloud.FileProviders.AliyunDrive
                 .SetSize(1)
                 .SetPriority(CacheItemPriority.Normal)
                 // Remove from cache after this time, regardless of sliding expiration
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(20));
         }
 
         /// <summary>
