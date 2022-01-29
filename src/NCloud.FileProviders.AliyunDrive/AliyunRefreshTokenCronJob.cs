@@ -12,6 +12,7 @@ namespace NCloud.FileProviders.AliyunDrive
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
     using NCloud.Core;
+    using NCloud.FileProviders.Support.Logger;
 
     /// <summary>
     /// AliyunRefreshTokenCronJob
@@ -22,10 +23,12 @@ namespace NCloud.FileProviders.AliyunDrive
 
         public static List<AliyunDriveFileProvider> AliyunDriveFileProviders { get; set; } = new List<AliyunDriveFileProvider>();
 
-
-        public AliyunRefreshTokenCronJob(ILogger<AliyunRefreshTokenCronJob> logger) : base(@"0 0 */2 * *", TimeZoneInfo.Local)
+        /// <summary>
+        /// 
+        /// </summary>
+        public AliyunRefreshTokenCronJob() : base(@"0 0 */2 * *", TimeZoneInfo.Local)
         {
-            this.logger = logger;
+            this.logger = ApplicationLogging.CreateLogger<AliyunRefreshTokenCronJob>();
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
